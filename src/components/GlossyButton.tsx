@@ -18,7 +18,7 @@ const GlossyButton = React.forwardRef<HTMLButtonElement, GlossyButtonProps>(
       primary: "bg-gradient-to-br from-indigo-500/80 to-purple-600/80 text-white border-white/20",
       secondary: "bg-white/10 text-white border-white/10 backdrop-blur-md",
       glass: "glossy-bubble text-white border-white/40 shadow-xl",
-      liquid: "btn-liquid text-white border-white/10",
+      liquid: "btn-liquid text-white border-white/20 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] hover:scale-105 transition-all duration-500",
     };
 
     const Comp = asChild ? Slot : "button";
