@@ -70,9 +70,9 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
+                <GlossyButton variant="secondary" className="h-10 px-6 text-sm">
                   Log in
-                </Button>
+                </GlossyButton>
               </SignInButton>
               <SignUpButton mode="modal">
                 <GlossyButton variant="liquid" className="h-10 px-6 text-sm">
@@ -558,15 +558,15 @@ export default function LandingPage() {
               Join thousands of professionals using AI to make smarter career decisions.
               Start your free analysis today.
             </p>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-200/50 border-0 h-12 px-8 text-base"
+            <GlossyButton
+              variant="liquid"
+              className="h-14 px-10 text-lg"
               asChild
             >
               <Link href="/dashboard/chat">
                 Start Free Analysis <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
-            </Button>
+            </GlossyButton>
           </motion.div>
         </motion.div>
       </section>

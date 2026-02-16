@@ -268,12 +268,48 @@
     position: absolute;
     inset: -5px;
     z-index: -1;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px) contrast(1.2) saturate(1.5);
     filter: url(#btn-glass);
     pointer-events: none;
     border-radius: inherit;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      inset 0 0 15px rgba(255, 255, 255, 0.4),
+      inset 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-liquid::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 10%;
+    right: 10%;
+    height: 30%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 50% / 100% 100% 0 0;
+    pointer-events: none;
+    z-index: 1;
+    filter: blur(1px);
+  }
+
+  /* Text Reveal Animations */
+  @keyframes reveal-char {
+    0% {
+      opacity: 0;
+      transform: translateY(1em);
+      filter: blur(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  .text-reveal-char {
+    display: inline-block;
+    animation: reveal-char 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
   }
 }
 

@@ -48,10 +48,16 @@ export default function RootLayout({
                 <feDisplacementMap in="SourceGraphic" in2="blur" scale="40" xChannelSelector="R" yChannelSelector="G" />
               </filter>
               <filter id="btn-glass" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.015" numOctaves="3" seed="42" result="noise" />
-                <feGaussianBlur in="noise" stdDeviation="0.05" result="blur" />
-                <feDisplacementMap in="SourceGraphic" in2="blur" scale="15" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
+              <feTurbulence type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="3" seed="42" result="noise" />
+              <feGaussianBlur in="noise" stdDeviation="0.08" result="blur" />
+              <feDisplacementMap in="SourceGraphic" in2="blur" scale="25" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <filter id="shimmer-filter">
+              <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="2" seed="5">
+                <animate attributeName="seed" from="1" to="100" dur="10s" repeatCount="indefinite" />
+              </feTurbulence>
+              <feDisplacementMap in="SourceGraphic" scale="5" />
+            </filter>
             </defs>
           </svg>
         </body>

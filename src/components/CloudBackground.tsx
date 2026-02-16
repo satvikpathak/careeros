@@ -94,12 +94,12 @@ const CloudBackground: React.FC = () => {
         const geometries = [];
         const dummy = new THREE.Object3D();
 
-        for (let i = 0; i < 8000; i++) {
+        for (let i = 0; i < 2000; i++) {
           dummy.position.x = Math.random() * 1000 - 500;
           dummy.position.y = -Math.random() * Math.random() * 200 - 15;
-          dummy.position.z = i;
+          dummy.position.z = i * 4; // Spread them out more
           dummy.rotation.z = Math.random() * Math.PI;
-          dummy.scale.x = dummy.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+          dummy.scale.x = dummy.scale.y = Math.random() * Math.random() * 2.5 + 1.0;
           dummy.updateMatrix();
 
           const clonedPlaneGeo = planeGeo.clone();
