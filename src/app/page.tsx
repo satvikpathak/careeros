@@ -113,25 +113,31 @@ export default function LandingPage() {
             animate="visible"
             variants={staggerContainer}
           >
-            {/* Badge */}
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-sm text-gray-600 mb-8">
-              <Zap className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Powered by Google Gemini AI</span>
-              <ChevronRight className="w-3 h-3 text-gray-400" />
-            </motion.div>
 
             {/* Headline */}
             <motion.h1
               variants={fadeUp}
               className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9] mb-8 drop-shadow-2xl"
             >
-              Your Career,{" "}
+              {"Your Career,".split("").map((char, i) => (
+                <span key={i} className="text-reveal-char" style={{ animationDelay: `${i * 0.03}s` }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-blue-300">
-                Intelligently
+                {"Intelligently".split("").map((char, i) => (
+                  <span key={i} className="text-reveal-char" style={{ animationDelay: `${(i + 13) * 0.03}s` }}>
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
               </span>
               <br />
-              Guided by AI
+              {"Guided by AI".split("").map((char, i) => (
+                <span key={i} className="text-reveal-char" style={{ animationDelay: `${(i + 26) * 0.03}s` }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
             </motion.h1>
 
             {/* Subheadline */}
@@ -270,7 +276,13 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { 
+                opacity: 1,
+                transition: { staggerChildren: 0.1 }
+              }
+            }}
           >
             {[
               {
@@ -367,7 +379,13 @@ export default function LandingPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={staggerContainer}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { 
+                opacity: 1,
+                transition: { staggerChildren: 0.2 }
+              }
+            }}
           >
             {[
               {
