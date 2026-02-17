@@ -4,7 +4,18 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not defined");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 // ---- System Prompts ----
 
@@ -180,7 +191,7 @@ export async function chatWithGemini(
     parts: [{ text: msg.content }],
   }));
 
-  const response = await ai.models.generateContent({
+  const response = await getAI().models.generateContent({
     model: "gemini-2.5-flash",
     contents,
     config: {
@@ -204,7 +215,7 @@ export async function streamChatWithGemini(
     parts: [{ text: msg.content }],
   }));
 
-  const response = await ai.models.generateContentStream({
+  const response = await getAI().models.generateContentStream({
     model: "gemini-2.5-flash",
     contents,
     config: {
@@ -220,7 +231,7 @@ export async function streamChatWithGemini(
 // ---- Parse Resume with Gemini ----
 
 export async function parseResumeWithGemini(resumeText: string): Promise<string> {
-  const response = await ai.models.generateContent({
+  const response = await getAI().models.generateContent({
     model: "gemini-2.5-flash",
     contents: [
       {
@@ -241,7 +252,7 @@ export async function parseResumeWithGemini(resumeText: string): Promise<string>
 // ---- Generate Embeddings ----
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await ai.models.embedContent({
+  const response = await getAI().models.embedContent({
     model: "text-embedding-004",
     contents: text,
   });
@@ -255,7 +266,7 @@ export async function findResourcesWithGemini(
   careerTitle: string,
   skills: string[]
 ): Promise<string> {
-  const response = await ai.models.generateContent({
+  const response = await getAI().models.generateContent({
     model: "gemini-2.5-flash",
     contents: [
       {
