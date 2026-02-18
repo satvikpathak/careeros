@@ -2,7 +2,17 @@
 // CareerOS — Static Role Configuration (MVP)
 // ============================================
 
-import type { RoleConfig, InterestCategory, ConversationProgress, ProgressStage } from "./types";
+import type { User, CareerAudit, WeeklySprint } from "./types";
+
+export interface RoleConfig {
+  title: string;
+  base_salary: number;
+  growth_rate: number;
+  market_demand: number;
+  risk_level: "low" | "medium" | "high";
+  top_skills: string[];
+}
+
 
 export const ROLE_CONFIGS: Record<string, RoleConfig> = {
   "Software Engineer": {
@@ -177,131 +187,6 @@ export function calculateATSScore(
 }
 
 // ============================================
-// Career Pathfinder — Interest Categories
+// CareerOS 2.0 — Constants
 // ============================================
 
-export const INTEREST_CATEGORIES: InterestCategory[] = [
-  {
-    id: "technology",
-    label: "Technology & Coding",
-    icon: "💻",
-    description: "Building apps, websites, AI, or working with computers",
-    keywords: ["programming", "software", "AI", "web development", "data"],
-  },
-  {
-    id: "creative",
-    label: "Art & Design",
-    icon: "🎨",
-    description: "Drawing, graphic design, UI/UX, animation, or photography",
-    keywords: ["design", "art", "creative", "visual", "media"],
-  },
-  {
-    id: "science",
-    label: "Science & Research",
-    icon: "🔬",
-    description: "Experiments, biology, chemistry, physics, or space",
-    keywords: ["science", "research", "lab", "discovery", "experiments"],
-  },
-  {
-    id: "business",
-    label: "Business & Leadership",
-    icon: "📊",
-    description: "Entrepreneurship, management, marketing, or finance",
-    keywords: ["business", "management", "marketing", "finance", "startup"],
-  },
-  {
-    id: "healthcare",
-    label: "Healthcare & Medicine",
-    icon: "🏥",
-    description: "Helping people, medicine, psychology, or wellness",
-    keywords: ["medicine", "health", "psychology", "nursing", "therapy"],
-  },
-  {
-    id: "education",
-    label: "Teaching & Mentoring",
-    icon: "📚",
-    description: "Teaching, tutoring, content creation, or training",
-    keywords: ["teaching", "education", "mentoring", "training", "learning"],
-  },
-  {
-    id: "engineering",
-    label: "Engineering & Building",
-    icon: "⚙️",
-    description: "Mechanical, civil, electrical, or robotics engineering",
-    keywords: ["engineering", "robotics", "mechanical", "electrical", "building"],
-  },
-  {
-    id: "media",
-    label: "Media & Communication",
-    icon: "🎬",
-    description: "Writing, journalism, film, podcasting, or social media",
-    keywords: ["writing", "journalism", "media", "content", "communication"],
-  },
-  {
-    id: "sports",
-    label: "Sports & Fitness",
-    icon: "⚽",
-    description: "Sports management, coaching, fitness, or nutrition",
-    keywords: ["sports", "fitness", "coaching", "athletics", "nutrition"],
-  },
-  {
-    id: "law",
-    label: "Law & Social Justice",
-    icon: "⚖️",
-    description: "Law, politics, advocacy, or social work",
-    keywords: ["law", "politics", "justice", "advocacy", "policy"],
-  },
-  {
-    id: "environment",
-    label: "Environment & Nature",
-    icon: "🌍",
-    description: "Sustainability, agriculture, wildlife, or climate science",
-    keywords: ["environment", "sustainability", "nature", "agriculture", "climate"],
-  },
-  {
-    id: "finance",
-    label: "Money & Finance",
-    icon: "💰",
-    description: "Investing, accounting, banking, or crypto",
-    keywords: ["finance", "investing", "accounting", "banking", "economics"],
-  },
-];
-
-// ============================================
-// Career Pathfinder — Progress Stage Config
-// ============================================
-
-export const PROGRESS_STAGES: { stage: ProgressStage; label: string; weight: number }[] = [
-  { stage: "interests", label: "Understanding Interests", weight: 20 },
-  { stage: "strengths", label: "Identifying Strengths", weight: 20 },
-  { stage: "education", label: "Education & Background", weight: 15 },
-  { stage: "preferences", label: "Work Preferences", weight: 15 },
-  { stage: "goals", label: "Future Goals", weight: 15 },
-  { stage: "analysis", label: "Generating Analysis", weight: 15 },
-];
-
-export function calculateConversationProgress(
-  messageCount: number,
-  stagesCompleted: string[]
-): ConversationProgress {
-  const totalStages = PROGRESS_STAGES.length;
-  const completedWeight = PROGRESS_STAGES
-    .filter((s) => stagesCompleted.includes(s.stage))
-    .reduce((sum, s) => sum + s.weight, 0);
-
-  // Also factor in message count (more messages = more progress, capped)
-  const messageBonus = Math.min(messageCount * 3, 15);
-  const percentage = Math.min(completedWeight + messageBonus, 100);
-
-  const currentStageIndex = stagesCompleted.length;
-  const currentStage = PROGRESS_STAGES[currentStageIndex] || PROGRESS_STAGES[totalStages - 1];
-
-  return {
-    stage: currentStage.stage,
-    percentage,
-    stagesCompleted,
-    totalStages,
-    currentStageLabel: currentStage.label,
-    isComplete: percentage >= 85 || stagesCompleted.length >= totalStages - 1,
-  };
-}

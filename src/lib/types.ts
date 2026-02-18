@@ -1,74 +1,74 @@
 // ============================================
-// CareerOS — Core Type Definitions
+// CareerOS 2.0 — Core Type Definitions
 // ============================================
 
-// ---- Database Entities ----
+// ---- Database Entities (Drizzle) ----
 
 export interface User {
-  id: string;
+  id: number;
+  clerkId: string;
+  name?: string;
   email: string;
-  full_name?: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
+  subscriptionTier: string;
+  streakCount: number;
+  lastAuditAt?: Date;
+  createdAt: Date;
 }
 
-export interface Profile {
-  id: string;
-  user_id: string;
-  skills: string[];
-  target_roles: TargetRole[];
-  experience_years: number;
-  risk_score: number;
-  career_analysis: CareerAnalysis | null;
-  created_at: string;
-  updated_at: string;
+export interface CareerAudit {
+  id: number;
+  userId: number;
+  readiness_score: number;
+  market_match_score: number;
+  project_quality_score: number;
+  skill_map: Record<string, number>;
+  skill_gaps: string[];
+  depth_vs_breadth: string;
+  ats_recommendations: string[];
+  market_alignment_insights: string;
+  github_analysis?: any;
+  createdAt: Date;
 }
 
-export interface Conversation {
-  id: string;
-  user_id: string;
-  messages: ChatMessage[];
-  status: "active" | "completed" | "archived";
-  extracted_profile: CareerAnalysis | null;
-  created_at: string;
-  updated_at: string;
+export interface WeeklySprint {
+  id: number;
+  userId: number;
+  weekNumber: number;
+  year: number;
+  tasks: SprintTask[];
+  completionRate: number;
+  createdAt: Date;
 }
 
-export interface Resume {
+export interface SprintTask {
   id: string;
-  user_id: string;
-  s3_url: string;
-  file_name: string;
-  parsed_data: ParsedResume;
-  ats_score: number;
-  embedding?: number[];
-  created_at: string;
-  updated_at: string;
+  type: "Skill Development" | "Portfolio Improvement" | "Networking" | "Interview Prep";
+  description: string;
+  time_estimate: string;
+  measurable_outcome: string;
+  completed: boolean;
 }
 
-export interface Job {
-  id: string;
-  external_id?: string;
+export interface SkillProgress {
+  id: number;
+  userId: number;
+  skillCategory: string;
+  score: number;
+  lastUpdated: Date;
+}
+
+export interface ProjectIdea {
+  id: number;
+  userId: number;
   title: string;
-  company: string;
-  location?: string;
-  salary?: string;
-  description?: string;
-  url?: string;
-  source: "linkedin" | "indeed" | "naukri" | "other";
-  embedding?: number[];
-  created_at: string;
-}
-
-export interface Match {
-  id: string;
-  user_id: string;
-  job_id: string;
-  resume_id?: string;
-  match_score: number;
-  created_at: string;
-  job?: Job; // joined
+  role: string;
+  description: string;
+  techStack: string[];
+  features: string[];
+  architecture: string;
+  deploymentGuide: string;
+  resumePoints: string[];
+  createdAt: Date;
 }
 
 // ---- AI / Gemini Types ----
@@ -80,35 +80,33 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-export interface CareerAnalysis {
-  top_roles: TopRole[];
-  skills_detected: string[];
-  skill_gaps: string[];
-  recommended_roadmap: RoadmapItem[];
+export interface PlacementAnalysis {
+  company_specific_roadmap: string;
+  dsa_topic_heatmap: Record<string, number>;
+  hr_question_generator: string[];
+  interview_readiness_score: number;
 }
 
-export interface TopRole {
-  title: string;
-  fit_score: number;
-  salary_range: string;
-  risk_index: string;
-  growth_rate: string;
+// ---- API Response Types ----
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
-export interface RoadmapItem {
-  step: number;
-  title: string;
-  description: string;
-  duration: string;
-  resources: string[];
-}
+// ---- Legacy Types (For Compatibility) ----
 
-export interface TargetRole {
-  title: string;
-  priority: number;
+export interface Profile {
+  id: string;
+  userId: string;
+  skills: string[];
+  target_roles: TargetRole[];
+  experience_years: number;
+  risk_score: number;
+  created_at: string;
+  updated_at: string;
 }
-
-// ---- Resume Parsing ----
 
 export interface ParsedResume {
   skills: string[];
@@ -132,65 +130,10 @@ export interface Project {
   technologies: string[];
 }
 
-// ---- Job Search ----
-
-export interface JobSearchParams {
-  query: string;
-  location?: string;
-  page?: number;
-  source?: "linkedin" | "indeed" | "naukri" | "all";
-}
-
-export interface NormalizedJob {
-  id: string;
+export interface TargetRole {
   title: string;
-  company: string;
-  location: string;
-  salary: string;
-  description: string;
-  url: string;
-  source: "linkedin" | "indeed" | "naukri";
+  priority: number;
 }
-
-// ---- Simulation ----
-
-export interface SalarySimulation {
-  year: number;
-  salary: number;
-  role: string;
-}
-
-export interface MarketDemand {
-  month: string;
-  demand: number;
-  role: string;
-}
-
-// ---- API Response Types ----
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-export interface StreamChunk {
-  type: "text" | "json" | "done" | "error";
-  content: string;
-}
-
-// ---- Role Config (Static MVP Data) ----
-
-export interface RoleConfig {
-  title: string;
-  base_salary: number;
-  growth_rate: number;
-  market_demand: number;
-  risk_level: "low" | "medium" | "high";
-  top_skills: string[];
-}
-
-// ---- Career Pathfinder ----
 
 export interface InterestCategory {
   id: string;
@@ -244,8 +187,6 @@ export interface PathfinderRoadmapItem {
   resources_needed: string[];
 }
 
-// ---- Learning Resources ----
-
 export interface LearningResource {
   id: string;
   title: string;
@@ -272,4 +213,40 @@ export interface RoadmapMilestone {
   skills: string[];
   resources: LearningResource[];
   isCompleted: boolean;
+}
+// ---- Market & Job Types ----
+
+export interface Job {
+  id: string;
+  external_id?: string;
+  title: string;
+  company: string;
+  location?: string;
+  salary?: string;
+  description?: string;
+  url?: string;
+  source: "linkedin" | "indeed" | "naukri" | "other";
+  embedding?: number[];
+  createdAt: Date;
+}
+
+export interface Match {
+  id: string;
+  userId: string;
+  jobId: string;
+  resumeId?: string;
+  match_score: number;
+  createdAt: Date;
+  job?: Job;
+}
+
+export interface NormalizedJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  description: string;
+  url: string;
+  source: "linkedin" | "indeed" | "naukri";
 }

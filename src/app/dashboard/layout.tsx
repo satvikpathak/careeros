@@ -19,11 +19,9 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/chat", label: "AI Agent", icon: Bot },
-  { href: "/dashboard/pathfinder", label: "Pathfinder", icon: Compass },
-  { href: "/dashboard/roadmap", label: "Roadmap", icon: MapIcon },
-  { href: "/dashboard/resume", label: "Resume", icon: FileText },
-  { href: "/dashboard/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/dashboard/chat", label: "AI Interview", icon: Bot },
+  { href: "/dashboard/resume", label: "Intelligence Audit", icon: FileText },
+  { href: "/dashboard/jobs", label: "Job Radar", icon: Briefcase },
 ];
 
 export default function DashboardLayout({

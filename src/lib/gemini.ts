@@ -1,289 +1,201 @@
 // ============================================
-// CareerOS — Google Gemini AI Client
+// CareerOS 2.5 — Google Gemini AI Client
 // ============================================
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-let aiInstance: GoogleGenAI | null = null;
+let aiInstance: GoogleGenerativeAI | null = null;
 
-function getAI() {
+export function getAI() {
   if (!aiInstance) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not defined");
     }
-    aiInstance = new GoogleGenAI({ apiKey });
+    // Simplified initialization to fix type error; SDK handles versioning via model strings
+    aiInstance = new GoogleGenerativeAI(apiKey); 
   }
   return aiInstance;
 }
 
-// ---- System Prompts ----
+// ---- MODULE 1: Career Intelligence Audit ----
 
-export const CAREER_AGENT_SYSTEM_PROMPT = `You are an AI Career Intelligence Agent for CareerOS.
+export const CAREER_AUDIT_PROMPT = `You are the Career Intelligence Audit AI for CareerOS 2.0.
+Your task is to analyze a user's resume and GitHub data to provide a quantified readiness audit.
 
-Your job:
-1. Conduct a structured interactive career analysis through conversation.
-2. Ask follow-up questions based on user answers — be conversational, warm, and insightful.
-3. Ask about: current role, skills, experience, education, interests, career goals, preferred work style, salary expectations, and location preferences.
-4. Ask ONE question at a time. Keep questions focused and clear.
-5. After gathering enough information (typically 6-8 exchanges), inform the user you're generating their career analysis.
-6. When you have enough information, respond with EXACTLY this JSON wrapped in \`\`\`json code block:
+INPUT DATA:
+- Resume Text
+- GitHub Profile Analysis (optional)
+- Target Role
 
-\`\`\`json
+OUTPUT: Return EXACTLY this JSON:
 {
-  "top_roles": [
+  "readiness_score": 85,
+  "market_match_score": 70,
+  "project_quality_score": 75,
+  "skill_map": {
+    "Frontend": 80,
+    "Backend": 60,
+    "DevOps": 40,
+    "DSA": 90,
+    "System Design": 50
+  },
+  "skill_gaps": ["Redux", "Docker", "CI/CD"],
+  "depth_vs_breadth": "Analysis of whether the user is a specialist or generalist",
+  "ats_recommendations": ["keyword1", "keyword2"],
+  "market_alignment_insights": "Brief analysis of how well the user fits current hiring trends"
+}
+
+Guidelines:
+- readiness_score should be objective and tough.
+- project_quality_score should focus on complexity and impact.
+- skill_map should cover major engineering categories.
+- skill_gaps must be specific to the Target Role.`;
+
+// ---- MODULE 2: Weekly AI Career Sprint Engine ----
+
+export const SPRINT_GENERATOR_PROMPT = `You are the Career Sprint Engine for CareerOS 2.0. 
+Every week, you generate a high-impact execution plan for a developer.
+
+CONTEXT:
+- Current Skill Map
+- Skill Gaps
+- Target Role
+- Current Progress
+
+OUTPUT: Return EXACTLY this JSON:
+{
+  "week_number": 1,
+  "tasks": [
     {
-      "title": "Role Title",
-      "fit_score": 85,
-      "salary_range": "$80,000 - $120,000",
-      "risk_index": "Low",
-      "growth_rate": "15%"
-    }
-  ],
-  "skills_detected": ["skill1", "skill2"],
-  "skill_gaps": ["gap1", "gap2"],
-  "recommended_roadmap": [
-    {
-      "step": 1,
-      "title": "Step Title",
-      "description": "What to do",
-      "duration": "2 months",
-      "resources": ["resource1"]
-    }
+      "id": "task_1",
+      "type": "Skill Development",
+      "description": "Learn and implement X in a small project",
+      "time_estimate": "4 hours",
+      "measurable_outcome": "Completed Code/Certificate"
+    },
+    { "id": "task_2", "type": "Portfolio Improvement", "description": "Refactor Y in project Z for better performance", "time_estimate": "3 hours", "measurable_outcome": "GH Commit" },
+    { "id": "task_3", "type": "Networking", "description": "Connect with 3 developers in Target Role on LinkedIn", "time_estimate": "1 hour", "measurable_outcome": "Sent Requests" },
+    { "id": "task_4", "type": "Interview Prep", "description": "Solve 5 Medium DSA problems on topic A", "time_estimate": "5 hours", "measurable_outcome": "Solved Count" }
   ]
 }
-\`\`\`
 
 Guidelines:
-- Be professional yet friendly
-- Provide at least 3 top roles
-- Be realistic with salary ranges based on experience and location
-- Identify genuine skill gaps
-- Create actionable roadmap steps
-- Never return unstructured analysis output`;
+- Generate 5 tasks total.
+- Tasks must be actionable and measurable.
+- Focus on closing the most critical skill gap first.`;
 
-export const RESUME_PARSER_PROMPT = `You are an expert resume analyzer for CareerOS.
+// ---- MODULE 5: AI Project Builder Mode ----
 
-Analyze the provided resume text and extract structured information.
+export const PROJECT_BUILDER_PROMPT = `You are the AI Project Builder for CareerOS 2.0.
+Generate portfolio-grade project ideas that will WOW recruiters.
 
-Return ONLY valid JSON in this exact format:
+OUTPUT: Return EXACTLY this JSON:
+[
+  {
+    "title": "Project Name",
+    "description": "Unique selling point and core functionality",
+    "tech_stack": ["React", "Go", "PostgreSQL"],
+    "features": ["Feature 1", "Feature 2"],
+    "architecture": "High-level overview (Microservices/Monolith/Serverless)",
+    "deployment_guide": "Platform and tool recommendations",
+    "resume_points": ["Bullet 1", "Bullet 2"]
+  }
+]
+
+Guidelines:
+- Generate 3 distinct ideas.
+- Ensure ideas are not "generic" (e.g., no simple To-do apps).
+- Focus on "Resume-Ready" features that demonstrate seniority.`;
+
+// ---- MODULE 6: Placement Mode (India-Focused) ----
+
+export const PLACEMENT_PREP_PROMPT = `You are the Placement Mode AI for CareerOS 2.0, specializing in the Indian tech hiring landscape.
+
+OUTPUT: Return EXACTLY this JSON:
 {
-  "skills": ["skill1", "skill2"],
-  "experience_years": "3",
-  "education": [
-    {
-      "degree": "B.S. Computer Science",
-      "institution": "MIT",
-      "year": "2020"
-    }
-  ],
-  "projects": [
-    {
-      "name": "Project Name",
-      "description": "Brief description",
-      "technologies": ["tech1", "tech2"]
-    }
-  ],
-  "strength_score": 75,
-  "missing_keywords": ["keyword1", "keyword2"],
-  "summary": "Brief professional summary"
+  "company_specific_roadmap": "Analysis for target companies like (TCS, Zomato, Google India, etc.)",
+  "dsa_topic_heatmap": { "Arrays": 90, "Graphs": 50, "DP": 70 },
+  "hr_question_generator": ["Question 1", "Question 2"],
+  "interview_readiness_score": 65
 }
 
 Guidelines:
-- Extract ALL skills mentioned (technical and soft skills)
-- Calculate experience_years from work history dates
-- strength_score (0-100) based on: skill diversity, experience depth, project quality, education relevance
-- missing_keywords: important industry keywords NOT present but commonly expected
-- Be thorough and accurate`;
-
-// ---- Pathfinder System Prompt ----
-
-export const PATHFINDER_SYSTEM_PROMPT = `You are a Career Pathfinder AI — a warm, encouraging career counselor for people (especially young students, fresh graduates, or career changers) who are unsure about their career direction.
-
-Your goal: Help them discover their ideal career path through a friendly conversation.
-
-CONVERSATION FLOW:
-1. INTERESTS (Stage 1): Start by acknowledging their selected interests. Ask about what specifically excites them — which activities/topics they love and lose track of time doing.
-2. STRENGTHS (Stage 2): Ask about their strengths, what they're naturally good at, subjects they excel in, compliments they receive.
-3. EDUCATION (Stage 3): Ask about their current education level, what they're studying or plan to study, any courses/certifications.
-4. PREFERENCES (Stage 4): Ask about work environment preferences — remote vs office, team vs solo, creative vs structured, fast-paced vs steady.
-5. GOALS (Stage 5): Ask about their dreams, where they see themselves in 5-10 years, what success means to them.
-
-CRITICAL RULES:
-- Ask ONE question at a time. Be conversational and warm. Use emojis occasionally.
-- Each response MUST include a "progress" JSON tag indicating which stages are now covered.
-- After EACH response, append this on a NEW line at the very end:
-
-<!--PROGRESS:{"stages_completed":["interests","strengths"],"current_stage":"education","message_count":4}-->
-
-- When you have gathered enough info across ALL 5 stages (typically 6-10 exchanges), STOP asking questions.
-- When stopping, inform the user: "I now have a clear picture! Let me generate your career analysis..." 
-- Then output the full analysis as a JSON block:
-
-\`\`\`json
-{
-  "recommended_careers": [
-    {
-      "title": "Career Title",
-      "match_score": 85,
-      "why": "Reason this matches their profile",
-      "salary_range": "$60,000 - $100,000",
-      "education_path": "What education/training is needed",
-      "growth_outlook": "Growing/Stable/Declining"
-    }
-  ],
-  "personality_traits": ["curious", "analytical"],
-  "interest_alignment": ["technology", "creative"],
-  "strengths_identified": ["problem solving", "communication"],
-  "exploration_areas": ["Areas they should explore more"],
-  "roadmap": [
-    {
-      "phase": 1,
-      "title": "Foundation Phase",
-      "description": "What to do",
-      "duration": "3 months",
-      "skills_to_learn": ["skill1", "skill2"],
-      "resources_needed": ["YouTube courses", "Coursera"]
-    }
-  ]
-}
-\`\`\`
-
-Guidelines:
-- Give at LEAST 4 career recommendations with varied options
-- Be realistic but encouraging — show them the possibilities
-- For young/uncertain users, focus on exploration and exposure rather than locking into one path
-- Include non-traditional careers too (content creator, indie game dev, etc.)
-- Salary ranges should be realistic for entry-level to mid-career
-- The roadmap should have 4-6 phases spanning 1-3 years`;
-
-// ---- Resource Finder Prompt ----
-
-export const RESOURCE_FINDER_PROMPT = `You are a learning resource curator for CareerOS.
-
-Given a career title and list of skills, generate YouTube search queries and Coursera course suggestions.
-
-Return ONLY valid JSON:
-{
-  "youtube_queries": ["query1 tutorial playlist", "query2 beginner course"],
-  "coursera_keywords": ["keyword1", "keyword2"],
-  "free_resources": [
-    {
-      "title": "Resource Name",
-      "url": "https://example.com",
-      "source": "freecodecamp",
-      "description": "What it covers"
-    }
-  ],
-  "learning_path_summary": "A brief 2-3 sentence overview of the optimal learning path"
-}
-
-Generate 5-8 YouTube search queries and 3-5 Coursera keywords. Focus on FREE resources. Include beginner-friendly options.`;
+- Tailor advice for Tier 1/2/3 placement scenarios.
+- Focus on high-frequency DSA patterns in India.`;
 
 // ---- Chat with Gemini ----
 
 export async function chatWithGemini(
   messages: { role: string; content: string }[],
-  systemPrompt: string = CAREER_AGENT_SYSTEM_PROMPT
+  systemPrompt: string
 ): Promise<string> {
-  const contents = messages.map((msg) => ({
+  // 1. Move Personas: Shift any system messages from history to systemInstruction
+  const systemMessages = messages.filter(m => m.role === "system");
+  const otherMessages = messages.filter(m => m.role !== "system");
+
+  const combinedSystemPrompt = [
+    systemPrompt,
+    ...systemMessages.map(m => m.content)
+  ].filter(Boolean).join("\n\n");
+
+  const model = getAI().getGenerativeModel(
+    {
+      model: "gemini-1.5-flash",
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: combinedSystemPrompt || "You are the CareerOS expert assistant." }]
+      }
+    },
+    { apiVersion: "v1beta" }
+  );
+
+  // 2. Correct Role Mapping: assistant -> model
+  // 3. Fix Gemini History: Ensure history[0].role === 'user' & roles alternate properly
+  const historyRaw = otherMessages.slice(0, -1);
+  const lastMessage = otherMessages[otherMessages.length - 1];
+
+  let history = historyRaw.map((msg) => ({
     role: msg.role === "assistant" ? "model" : "user",
     parts: [{ text: msg.content }],
   }));
 
-  const response = await getAI().models.generateContent({
-    model: "gemini-2.5-flash",
-    contents,
-    config: {
-      systemInstruction: systemPrompt,
-      temperature: 0.7,
-      maxOutputTokens: 2048,
-    },
-  });
+  // Ensure history[0].role === 'user'
+  let userIndex = history.findIndex(h => h.role === "user");
+  if (userIndex !== -1) {
+    history = history.slice(userIndex);
+  } else {
+    history = [];
+  }
 
-  return response.text || "";
-}
-
-// ---- Stream Chat with Gemini ----
-
-export async function streamChatWithGemini(
-  messages: { role: string; content: string }[],
-  systemPrompt: string = CAREER_AGENT_SYSTEM_PROMPT
-) {
-  const contents = messages.map((msg) => ({
-    role: msg.role === "assistant" ? "model" : "user",
-    parts: [{ text: msg.content }],
-  }));
-
-  const response = await getAI().models.generateContentStream({
-    model: "gemini-2.5-flash",
-    contents,
-    config: {
-      systemInstruction: systemPrompt,
-      temperature: 0.7,
-      maxOutputTokens: 2048,
-    },
-  });
-
-  return response;
+  const chat = model.startChat({ history });
+  const result = await chat.sendMessage(lastMessage.content);
+  return result.response.text();
 }
 
 // ---- Parse Resume with Gemini ----
 
-export async function parseResumeWithGemini(resumeText: string): Promise<string> {
-  const response = await getAI().models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: `Analyze this resume and return structured JSON:\n\n${resumeText}` }],
-      },
-    ],
-    config: {
-      systemInstruction: RESUME_PARSER_PROMPT,
-      temperature: 0.3,
-      maxOutputTokens: 2048,
+export async function parseResumeWithGemini(resumeText: string, targetRole: string = "Software Engineer"): Promise<string> {
+  const model = getAI().getGenerativeModel(
+    {
+      model: "gemini-1.5-flash",
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: CAREER_AUDIT_PROMPT }]
+      }
     },
-  });
+    { apiVersion: "v1beta" }
+  );
 
-  return response.text || "{}";
+  const prompt = `Analyze this resume for the role of ${targetRole}:\n\n${resumeText}`;
+  const result = await model.generateContent(prompt);
+  return result.response.text();
 }
 
 // ---- Generate Embeddings ----
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await getAI().models.embedContent({
-    model: "text-embedding-004",
-    contents: text,
-  });
-
-  return response.embeddings?.[0]?.values || [];
-}
-
-// ---- Find Learning Resources with Gemini ----
-
-export async function findResourcesWithGemini(
-  careerTitle: string,
-  skills: string[]
-): Promise<string> {
-  const response = await getAI().models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: [
-      {
-        role: "user",
-        parts: [
-          {
-            text: `Find learning resources for someone pursuing a career as: ${careerTitle}\n\nKey skills to learn: ${skills.join(", ")}\n\nReturn YouTube search queries, Coursera keywords, and free resource suggestions.`,
-          },
-        ],
-      },
-    ],
-    config: {
-      systemInstruction: RESOURCE_FINDER_PROMPT,
-      temperature: 0.5,
-      maxOutputTokens: 2048,
-    },
-  });
-
-  return response.text || "{}";
+  const model = getAI().getGenerativeModel({ model: "text-embedding-004" });
+  const result = await model.embedContent(text);
+  return result.embedding.values;
 }
