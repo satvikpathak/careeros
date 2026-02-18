@@ -1,16 +1,24 @@
 // ============================================
-// CareerOS — Resume Upload & Parse API Route
+// CareerOS 2.0 — Unified Career Audit API
 // ============================================
 
 import { NextRequest, NextResponse } from "next/server";
 import { uploadToS3 } from "@/lib/s3";
 import { parseResumeWithGemini, generateEmbedding } from "@/lib/gemini";
-import { PDFParse } from "pdf-parse";
+import pdf from "pdf-parse-fork";
+import { getGitHubProfileData } from "@/lib/github";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { syncUserWithNeon } from "@/lib/user-sync";
+import { db } from "@/db";
+import { careerAudits, users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
+    const githubUrl = formData.get("githubUrl") as string || "";
+    const targetRole = formData.get("targetRole") as string || "Software Engineer";
 
     if (!file) {
       return NextResponse.json(
@@ -26,23 +34,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Read file buffer
+    // 1. Read file buffer & Extract Text
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    // 2. Upload to S3
-    let s3Url = "";
-    try {
-      s3Url = await uploadToS3(buffer, file.name, file.type);
-    } catch (s3Error) {
-      console.warn("S3 upload failed, continuing with parsing:", s3Error);
-      s3Url = `local://${file.name}`;
-    }
-
-    // 3. Extract text from PDF
-    const pdf = new PDFParse({ data: new Uint8Array(bytes) });
-    const textResult = await pdf.getText();
-    const resumeText = textResult.text;
+    const pdfData = await pdf(buffer);
+    const resumeText = pdfData.text;
 
     if (!resumeText || resumeText.trim().length === 0) {
       return NextResponse.json(
@@ -51,34 +47,93 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Parse with Gemini
-    const parsedResponse = await parseResumeWithGemini(resumeText);
-
-    // Extract JSON from response (handle markdown code blocks)
-    let parsedData;
+    // 2. Upload to S3 (Background/Optional)
+    let s3Url = "";
     try {
-      const jsonMatch = parsedResponse.match(/```json\s*([\s\S]*?)\s*```/);
-      const jsonStr = jsonMatch ? jsonMatch[1] : parsedResponse;
-      parsedData = JSON.parse(jsonStr);
+      s3Url = await uploadToS3(buffer, file.name, file.type);
+    } catch (s3Error) {
+      console.warn("S3 upload failed:", s3Error);
+      s3Url = `local://${file.name}`;
+    }
+
+    // 3. GitHub Analysis (if URL provided)
+    let githubStats = null;
+    if (githubUrl) {
+      const username = githubUrl.split("/").pop();
+      if (username) {
+        githubStats = await getGitHubProfileData(username);
+      }
+    }
+
+    // 4. Unified AI Audit (Gemini)
+    const auditDataRaw = await parseResumeWithGemini(
+      `RESUME:\n${resumeText}\n\nGITHUB_STATS:\n${JSON.stringify(githubStats || "None")}`,
+      targetRole
+    );
+
+    let audit;
+    try {
+      const jsonMatch = auditDataRaw.match(/```json\s*([\s\S]*?)\s*```/);
+      const jsonStr = jsonMatch ? jsonMatch[1] : auditDataRaw;
+      audit = JSON.parse(jsonStr);
     } catch {
-      parsedData = {
-        skills: [],
-        experience_years: "0",
-        education: [],
-        projects: [],
-        strength_score: 0,
-        missing_keywords: [],
-        summary: resumeText.substring(0, 500),
+      audit = {
+        readiness_score: 0,
+        market_match_score: 0,
+        project_quality_score: 0,
+        skill_map: {},
+        skill_gaps: [],
+        depth_vs_breadth: "N/A",
+        ats_recommendations: [],
+        market_alignment_insights: "AI matching failed",
       };
     }
 
-    // 5. Generate embedding for semantic matching
+    // 5. Generate embedding for matching
     let embedding: number[] = [];
     try {
-      const summaryText = `${parsedData.skills?.join(", ")} ${parsedData.summary || ""} ${parsedData.experience_years} years experience`;
+      const summaryText = `${Object.keys(audit.skill_map).join(", ")} ${audit.skill_gaps.join(", ")} ${targetRole}`;
       embedding = await generateEmbedding(summaryText);
     } catch (embError) {
       console.warn("Embedding generation failed:", embError);
+    }
+
+    // 6. DB Persistence
+    const { userId: clerkId } = await auth();
+    const user = await currentUser();
+    
+    let dbUser = null;
+    let savedAuditId = null;
+
+    if (clerkId && user) {
+      const email = user.emailAddresses[0].emailAddress;
+      const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      
+      // Sync user
+      dbUser = await syncUserWithNeon(clerkId, email, name);
+
+      // Save audit
+      const [savedAudit] = await db.insert(careerAudits).values({
+        userId: dbUser.id,
+        readinessScore: audit.readiness_score,
+        marketMatchScore: audit.market_match_score,
+        projectQualityScore: audit.project_quality_score,
+        skillMap: audit.skill_map,
+        atsKeywordAnalysis: {
+          recommendations: audit.ats_recommendations,
+          skill_gaps: audit.skill_gaps,
+          depth_vs_breadth: audit.depth_vs_breadth,
+          market_alignment: audit.market_alignment_insights
+        },
+        githubAnalysis: githubStats,
+      }).returning();
+      
+      savedAuditId = savedAudit.id;
+
+      // Update user's last audit time
+      await db.update(users)
+        .set({ lastAuditAt: new Date() })
+        .where(eq(users.id, dbUser.id));
     }
 
     return NextResponse.json({
@@ -86,22 +141,21 @@ export async function POST(req: NextRequest) {
       data: {
         s3_url: s3Url,
         file_name: file.name,
-        parsed_data: parsedData,
+        audit,
+        github: githubStats,
         embedding: embedding.length > 0 ? embedding : undefined,
-        raw_text_length: resumeText.length,
+        auditId: savedAuditId,
+        userId: dbUser?.id,
       },
     });
   } catch (error: unknown) {
-    console.error("Resume parse error:", error);
+    console.error("Unified Audit error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to parse resume",
+        error: error instanceof Error ? error.message : "Internal Server Error",
       },
       { status: 500 }
     );
   }
 }
-
-// Next.js App Router handles body parsing automatically for FormData
-// No additional config needed

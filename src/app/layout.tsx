@@ -27,8 +27,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_c2hpbmluZy1jcmFiLTEwLmNsZXJrLmFjY291bnRzLmRldiQ";
+
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={clerkKey}>
       <html lang="en">
         <body
           className={`${outfit.variable} ${geistMono.variable} font-sans antialiased`}

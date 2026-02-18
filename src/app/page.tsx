@@ -16,6 +16,7 @@ import {
   Users,
   TrendingUp,
   Target,
+  Rocket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SplineScene from "@/components/SplineScene";
@@ -145,8 +146,8 @@ export default function LandingPage() {
               variants={fadeUp}
               className="text-xl sm:text-2xl text-white/70 max-w-2xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              The intelligent career copilot. CareerOS conducts AI interviews, 
-              parses resumes, and simulates your growth trajectory.
+              The AI career execution engine. CareerOS conducts readiness audits, 
+              generates weekly execution sprints, and builds your portfolio blueprints.
             </motion.p>
 
             {/* CTAs */}
@@ -154,14 +155,14 @@ export default function LandingPage() {
               <SignedOut>
                 <SignUpButton mode="modal">
                   <GlossyButton variant="liquid" className="h-16 px-12 text-xl">
-                    Start AI Analysis <Bot className="w-5 h-5 ml-2" />
+                    Get Your Readiness Score <Target className="w-5 h-5 ml-2" />
                   </GlossyButton>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
                 <GlossyButton variant="liquid" className="h-16 px-12 text-xl" asChild>
-                  <Link href="/dashboard/chat">
-                    Start AI Analysis <Bot className="w-5 h-5 ml-2" />
+                  <Link href="/dashboard">
+                    Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </GlossyButton>
               </SignedIn>
@@ -172,8 +173,8 @@ export default function LandingPage() {
                 className="text-white hover:bg-white/10 h-16 px-12 text-xl font-medium border border-white/10 backdrop-blur-sm rounded-full"
                 asChild
               >
-                <Link href="/dashboard">
-                  Explore Dashboard
+                <Link href="/dashboard/chat">
+                  Try Placement Mode
                 </Link>
               </Button>
             </motion.div>
@@ -286,50 +287,50 @@ export default function LandingPage() {
           >
             {[
               {
-                icon: Bot,
-                title: "AI Career Agent",
+                icon: Target,
+                title: "Intelligence Audit",
                 description:
-                  "Conversational AI conducts structured career interviews and generates personalized analysis with role recommendations.",
+                  "Quantified readiness score based on deep AI analysis of your resume and GitHub profile complexity.",
                 color: "#6366f1",
                 bg: "bg-indigo-50",
               },
               {
-                icon: FileText,
-                title: "Resume Intelligence",
+                icon: Zap,
+                title: "Weekly AI Sprints",
                 description:
-                  "Upload your resume for AI-powered parsing, skill extraction, ATS scoring, and improvement recommendations.",
+                  "5 actionable tasks every week designed to close your specific skill gaps and build your portfolio.",
                 color: "#a855f7",
                 bg: "bg-purple-50",
               },
               {
-                icon: Briefcase,
-                title: "Smart Job Matching",
+                icon: Rocket,
+                title: "Project Builder",
                 description:
-                  "Aggregates jobs from LinkedIn, Indeed, and Naukri, then ranks them using semantic similarity with your profile.",
+                  "Portfolio-grade project blueprints with architecture diagrams, tech stacks, and resume bullet points.",
                 color: "#10b981",
                 bg: "bg-emerald-50",
               },
               {
-                icon: BarChart3,
-                title: "Career Simulations",
+                icon: TrendingUp,
+                title: "Market Radar",
                 description:
-                  "Interactive salary projections, market demand charts, and risk indicators to visualize your career trajectory.",
+                  "Real-time demand analysis for tech stacks in your target role, helping you stay ahead of hiring trends.",
                 color: "#f59e0b",
                 bg: "bg-amber-50",
               },
               {
-                icon: Target,
-                title: "Skill Gap Analysis",
+                icon: Bot,
+                title: "Placement Mode",
                 description:
-                  "Identify missing skills for your target roles and get a step-by-step learning roadmap with resource suggestions.",
+                  "Specialized interview preparation for Indian tech companies with DSA topic heatmaps and HR prep.",
                 color: "#f43f5e",
                 bg: "bg-rose-50",
               },
               {
-                icon: TrendingUp,
-                title: "Career Roadmaps",
+                icon: Briefcase,
+                title: "Job Matching 2.0",
                 description:
-                  "AI-generated career progression paths with timelines, milestones, and actionable steps for each career goal.",
+                  "Aggregates matching jobs and ranks them by semantic similarity to your latest career audit results.",
                 color: "#06b6d4",
                 bg: "bg-cyan-50",
               },
@@ -390,24 +391,24 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Talk to AI",
+                title: "Intelligence Audit",
                 description:
-                  "Start a conversation with our AI agent. It asks intelligent questions about your skills, experience, and goals.",
-                icon: Bot,
+                  "Upload your resume and GitHub to get your Career Readiness Score and detailed skill gap analysis.",
+                icon: Target,
               },
               {
                 step: "02",
-                title: "Upload Resume",
+                title: "Weekly AI Sprints",
                 description:
-                  "Upload your resume for AI parsing. Get ATS scores, skill extraction, and personalized improvement tips.",
-                icon: FileText,
+                  "Execute your personalized 5-task sprint every week to close gaps and build your engineering presence.",
+                icon: Zap,
               },
               {
                 step: "03",
-                title: "Get Matched",
+                title: "Placement Mode",
                 description:
-                  "Browse semantically matched jobs from top platforms, view salary simulations, and follow your career roadmap.",
-                icon: Briefcase,
+                  "Transition into hunt mode with company-specific prep, DSA frequency maps, and HR simulators.",
+                icon: Rocket,
               },
             ].map((item) => (
               <motion.div

@@ -1,22 +1,22 @@
 // ============================================
-// CareerOS — Chat Store (Zustand)
+// CareerOS 2.0 — Chat Store (Zustand)
 // ============================================
 
 import { create } from "zustand";
-import type { ChatMessage, CareerAnalysis } from "@/lib/types";
+import type { ChatMessage, PlacementAnalysis } from "@/lib/types";
 
 interface ChatState {
   messages: ChatMessage[];
   isLoading: boolean;
   isAnalysisComplete: boolean;
-  careerAnalysis: CareerAnalysis | null;
+  placementAnalysis: PlacementAnalysis | null;
   conversationId: string | null;
 
   addMessage: (message: ChatMessage) => void;
   setMessages: (messages: ChatMessage[]) => void;
   setLoading: (loading: boolean) => void;
   setAnalysisComplete: (complete: boolean) => void;
-  setCareerAnalysis: (analysis: CareerAnalysis) => void;
+  setPlacementAnalysis: (analysis: PlacementAnalysis) => void;
   setConversationId: (id: string) => void;
   reset: () => void;
 }
@@ -25,7 +25,7 @@ export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   isLoading: false,
   isAnalysisComplete: false,
-  careerAnalysis: null,
+  placementAnalysis: null,
   conversationId: null,
 
   addMessage: (message) =>
@@ -37,8 +37,8 @@ export const useChatStore = create<ChatState>((set) => ({
 
   setAnalysisComplete: (isAnalysisComplete) => set({ isAnalysisComplete }),
 
-  setCareerAnalysis: (careerAnalysis) =>
-    set({ careerAnalysis, isAnalysisComplete: true }),
+  setPlacementAnalysis: (placementAnalysis) =>
+    set({ placementAnalysis, isAnalysisComplete: true }),
 
   setConversationId: (conversationId) => set({ conversationId }),
 
@@ -47,7 +47,7 @@ export const useChatStore = create<ChatState>((set) => ({
       messages: [],
       isLoading: false,
       isAnalysisComplete: false,
-      careerAnalysis: null,
+      placementAnalysis: null,
       conversationId: null,
     }),
 }));
