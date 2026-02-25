@@ -139,16 +139,13 @@ export async function chatWithGemini(
     ...systemMessages.map(m => m.content)
   ].filter(Boolean).join("\n\n");
 
-  const model = getAI().getGenerativeModel(
-    {
-      model: "gemini-1.5-flash",
-      systemInstruction: {
-        role: "system",
-        parts: [{ text: combinedSystemPrompt || "You are the CareerOS expert assistant." }]
-      }
-    },
-    { apiVersion: "v1beta" }
-  );
+  const model = getAI().getGenerativeModel({
+    model: "gemini-2.5-flash",
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: combinedSystemPrompt || "You are the CareerOS expert assistant." }]
+    }
+  });
 
   // 2. Correct Role Mapping: assistant -> model
   // 3. Fix Gemini History: Ensure history[0].role === 'user' & roles alternate properly
@@ -173,21 +170,58 @@ export async function chatWithGemini(
   return result.response.text();
 }
 
-// ---- Parse Resume with Gemini ----
+// ---- Parse Resume with Gemini (Career Audit) ----
 
 export async function parseResumeWithGemini(resumeText: string, targetRole: string = "Software Engineer"): Promise<string> {
-  const model = getAI().getGenerativeModel(
-    {
-      model: "gemini-1.5-flash",
-      systemInstruction: {
-        role: "system",
-        parts: [{ text: CAREER_AUDIT_PROMPT }]
-      }
-    },
-    { apiVersion: "v1beta" }
-  );
+  const model = getAI().getGenerativeModel({
+    model: "gemini-2.5-flash",
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: CAREER_AUDIT_PROMPT }]
+    }
+  });
 
   const prompt = `Analyze this resume for the role of ${targetRole}:\n\n${resumeText}`;
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
+
+// ---- Parse Resume into structured ParsedResume format ----
+
+export const RESUME_PARSE_PROMPT = `You are a resume parsing AI. Extract structured data from the resume text.
+
+OUTPUT: Return EXACTLY this JSON (no markdown, no code fences):
+{
+  "skills": ["Skill1", "Skill2"],
+  "experience_years": "3",
+  "education": [
+    { "degree": "B.Tech in CS", "institution": "IIT Delhi", "year": "2023" }
+  ],
+  "projects": [
+    { "name": "Project Name", "description": "Brief description", "technologies": ["React", "Node.js"] }
+  ],
+  "strength_score": 72,
+  "missing_keywords": ["Docker", "AWS", "CI/CD"],
+  "summary": "Brief 1-2 sentence professional summary"
+}
+
+Guidelines:
+- Extract ALL skills mentioned in the resume.
+- Estimate experience_years from dates or explicit mentions.
+- strength_score should be 0-100 based on overall resume quality.
+- missing_keywords should be skills commonly needed for the target role but absent from the resume.
+- If education or projects are not found, return empty arrays.`;
+
+export async function parseResumeStructured(resumeText: string, targetRole: string = "Software Engineer"): Promise<string> {
+  const model = getAI().getGenerativeModel({
+    model: "gemini-2.5-flash",
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: RESUME_PARSE_PROMPT }]
+    }
+  });
+
+  const prompt = `Parse this resume for the target role of ${targetRole}:\n\n${resumeText}`;
   const result = await model.generateContent(prompt);
   return result.response.text();
 }
@@ -195,7 +229,19 @@ export async function parseResumeWithGemini(resumeText: string, targetRole: stri
 // ---- Generate Embeddings ----
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const model = getAI().getGenerativeModel({ model: "text-embedding-004" });
-  const result = await model.embedContent(text);
-  return result.embedding.values;
+  try {
+    const model = getAI().getGenerativeModel({ model: "gemini-embedding-exp-03-07" });
+    const result = await model.embedContent(text);
+    return result.embedding.values;
+  } catch {
+    // Fallback: try text-embedding-004
+    try {
+      const model = getAI().getGenerativeModel({ model: "text-embedding-004" });
+      const result = await model.embedContent(text);
+      return result.embedding.values;
+    } catch {
+      console.warn("All embedding models failed");
+      return [];
+    }
+  }
 }

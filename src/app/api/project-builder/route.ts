@@ -4,17 +4,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAI, PROJECT_BUILDER_PROMPT } from "@/lib/gemini";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { syncUserWithNeon } from "@/lib/user-sync";
-import { db } from "@/db";
-import { projects } from "@/db/schema";
 
 export async function POST(req: NextRequest) {
   try {
     const { audit, targetRole } = await req.json();
 
     const model = getAI().getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: PROJECT_BUILDER_PROMPT,
     });
 
@@ -40,36 +36,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. DB Persistence
-    const { userId: clerkId } = await auth();
-    const user = await currentUser();
-    
+    // DB Persistence — best effort
     let dbUser = null;
     const savedProjectIds: number[] = [];
 
-    if (clerkId && user && Array.isArray(projectIdeas)) {
-      const email = user.emailAddresses[0].emailAddress;
-      const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-      
-      // Sync user
-      dbUser = await syncUserWithNeon(clerkId, email, name);
+    try {
+      const { auth, currentUser } = await import("@clerk/nextjs/server");
+      const { syncUserWithNeon } = await import("@/lib/user-sync");
+      const { db } = await import("@/db");
+      const { projects } = await import("@/db/schema");
 
-      // Save projects
-      for (const idea of projectIdeas) {
-        const [savedProject] = await db.insert(projects).values({
-          userId: dbUser.id,
-          title: idea.title,
-          role: targetRole || "Software Engineer",
-          description: idea.description,
-          techStack: idea.tech_stack,
-          features: idea.features,
-          architecture: idea.architecture,
-          deploymentGuide: idea.deployment_guide,
-          resumePoints: idea.resume_points,
-        }).returning();
-        
-        savedProjectIds.push(savedProject.id);
+      const { userId: clerkId } = await auth();
+      const user = await currentUser();
+
+      if (clerkId && user && Array.isArray(projectIdeas)) {
+        const email = user.emailAddresses[0].emailAddress;
+        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        dbUser = await syncUserWithNeon(clerkId, email, name);
+
+        for (const idea of projectIdeas) {
+          const [savedProject] = await db.insert(projects).values({
+            userId: dbUser.id,
+            title: idea.title,
+            role: targetRole || "Software Engineer",
+            description: idea.description,
+            techStack: idea.tech_stack,
+            features: idea.features,
+            architecture: idea.architecture,
+            deploymentGuide: idea.deployment_guide,
+            resumePoints: idea.resume_points,
+          }).returning();
+
+          savedProjectIds.push(savedProject.id);
+        }
       }
+    } catch (dbError) {
+      console.warn("Project builder DB persistence failed:", dbError);
     }
 
     return NextResponse.json({

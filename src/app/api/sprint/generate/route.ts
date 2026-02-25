@@ -4,10 +4,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAI, SPRINT_GENERATOR_PROMPT } from "@/lib/gemini";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { syncUserWithNeon } from "@/lib/user-sync";
-import { db } from "@/db";
-import { weeklySprints } from "@/db/schema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const model = getAI().getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: SPRINT_GENERATOR_PROMPT,
     });
 
@@ -49,35 +45,41 @@ export async function POST(req: NextRequest) {
     }
 
     // Add completion status to tasks
-    sprintData.tasks = sprintData.tasks.map((task: any) => ({
+    sprintData.tasks = (sprintData.tasks || []).map((task: any) => ({
       ...task,
       completed: false
     }));
 
-    // 6. DB Persistence
-    const { userId: clerkId } = await auth();
-    const user = await currentUser();
-    
+    // DB Persistence — best effort
     let dbUser = null;
     let savedSprintId = null;
 
-    if (clerkId && user) {
-      const email = user.emailAddresses[0].emailAddress;
-      const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-      
-      // Sync user
-      dbUser = await syncUserWithNeon(clerkId, email, name);
+    try {
+      const { auth, currentUser } = await import("@clerk/nextjs/server");
+      const { syncUserWithNeon } = await import("@/lib/user-sync");
+      const { db } = await import("@/db");
+      const { weeklySprints } = await import("@/db/schema");
 
-      // Save sprint
-      const [savedSprint] = await db.insert(weeklySprints).values({
-        userId: dbUser.id,
-        weekNumber: sprintData.week_number || weekNumber || 1,
-        year: new Date().getFullYear(),
-        tasks: sprintData.tasks,
-        completionRate: "0",
-      }).returning();
-      
-      savedSprintId = savedSprint.id;
+      const { userId: clerkId } = await auth();
+      const user = await currentUser();
+
+      if (clerkId && user) {
+        const email = user.emailAddresses[0].emailAddress;
+        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        dbUser = await syncUserWithNeon(clerkId, email, name);
+
+        const [savedSprint] = await db.insert(weeklySprints).values({
+          userId: dbUser.id,
+          weekNumber: sprintData.week_number || weekNumber || 1,
+          year: new Date().getFullYear(),
+          tasks: sprintData.tasks,
+          completionRate: "0",
+        }).returning();
+
+        savedSprintId = savedSprint.id;
+      }
+    } catch (dbError) {
+      console.warn("Sprint DB persistence failed:", dbError);
     }
 
     return NextResponse.json({

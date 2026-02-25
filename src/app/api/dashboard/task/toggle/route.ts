@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { db } from "@/db";
-import { weeklySprints, users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
+    const { auth } = await import("@clerk/nextjs/server");
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -16,6 +13,10 @@ export async function POST(req: NextRequest) {
     if (!sprintId || !taskId) {
       return NextResponse.json({ success: false, error: "Missing sprintId or taskId" }, { status: 400 });
     }
+
+    const { db } = await import("@/db");
+    const { weeklySprints, users } = await import("@/db/schema");
+    const { eq } = await import("drizzle-orm");
 
     // 1. Fetch the sprint
     const sprint = await db.query.weeklySprints.findFirst({
@@ -46,8 +47,7 @@ export async function POST(req: NextRequest) {
       })
       .where(eq(weeklySprints.id, sprintId));
 
-    // 5. Streak logic (Simplified: if completion rate > 0 and it's a new day, increment)
-    // For now, let's just increment streak if completion reaches 100% for the first time
+    // 5. Streak logic
     if (completedCount === tasks.length) {
        const user = await db.query.users.findFirst({
          where: eq(users.id, sprint.userId as number)
