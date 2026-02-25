@@ -3,15 +3,9 @@
 // ============================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { uploadToS3 } from "@/lib/s3";
-import { parseResumeWithGemini, generateEmbedding } from "@/lib/gemini";
+import { parseResumeWithGemini, parseResumeStructured, generateEmbedding } from "@/lib/gemini";
 import pdf from "pdf-parse-fork";
 import { getGitHubProfileData } from "@/lib/github";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { syncUserWithNeon } from "@/lib/user-sync";
-import { db } from "@/db";
-import { careerAudits, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,13 +41,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Upload to S3 (Background/Optional)
-    let s3Url = "";
+    // 2. S3 upload — best effort, non-blocking
+    let s3Url = `local://${file.name}`;
     try {
+      const { uploadToS3 } = await import("@/lib/s3");
       s3Url = await uploadToS3(buffer, file.name, file.type);
     } catch (s3Error) {
-      console.warn("S3 upload failed:", s3Error);
-      s3Url = `local://${file.name}`;
+      console.warn("S3 upload skipped/failed:", s3Error);
     }
 
     // 3. GitHub Analysis (if URL provided)
@@ -61,16 +55,24 @@ export async function POST(req: NextRequest) {
     if (githubUrl) {
       const username = githubUrl.split("/").pop();
       if (username) {
-        githubStats = await getGitHubProfileData(username);
+        try {
+          githubStats = await getGitHubProfileData(username);
+        } catch (ghError) {
+          console.warn("GitHub analysis failed:", ghError);
+        }
       }
     }
 
-    // 4. Unified AI Audit (Gemini)
-    const auditDataRaw = await parseResumeWithGemini(
-      `RESUME:\n${resumeText}\n\nGITHUB_STATS:\n${JSON.stringify(githubStats || "None")}`,
-      targetRole
-    );
+    // 4. Run both AI tasks in parallel: Career Audit + Structured Parse
+    const [auditDataRaw, parsedDataRaw] = await Promise.all([
+      parseResumeWithGemini(
+        `RESUME:\n${resumeText}\n\nGITHUB_STATS:\n${JSON.stringify(githubStats || "None")}`,
+        targetRole
+      ),
+      parseResumeStructured(resumeText, targetRole),
+    ]);
 
+    // Parse career audit
     let audit;
     try {
       const jsonMatch = auditDataRaw.match(/```json\s*([\s\S]*?)\s*```/);
@@ -89,51 +91,76 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    // 5. Generate embedding for matching
+    // Parse structured resume data
+    let parsedResume;
+    try {
+      const jsonMatch = parsedDataRaw.match(/```json\s*([\s\S]*?)\s*```/);
+      const jsonStr = jsonMatch ? jsonMatch[1] : parsedDataRaw;
+      parsedResume = JSON.parse(jsonStr);
+    } catch {
+      // Fallback: build from audit data
+      parsedResume = {
+        skills: Object.keys(audit.skill_map || {}),
+        experience_years: "0",
+        education: [],
+        projects: [],
+        strength_score: audit.readiness_score || 0,
+        missing_keywords: audit.skill_gaps || [],
+        summary: audit.depth_vs_breadth || "",
+      };
+    }
+
+    // 5. Generate embedding — best effort
     let embedding: number[] = [];
     try {
-      const summaryText = `${Object.keys(audit.skill_map).join(", ")} ${audit.skill_gaps.join(", ")} ${targetRole}`;
+      const summaryText = `${Object.keys(audit.skill_map || {}).join(", ")} ${(audit.skill_gaps || []).join(", ")} ${targetRole}`;
       embedding = await generateEmbedding(summaryText);
     } catch (embError) {
       console.warn("Embedding generation failed:", embError);
     }
 
-    // 6. DB Persistence
-    const { userId: clerkId } = await auth();
-    const user = await currentUser();
-    
+    // 6. DB Persistence — best effort, non-blocking
     let dbUser = null;
     let savedAuditId = null;
 
-    if (clerkId && user) {
-      const email = user.emailAddresses[0].emailAddress;
-      const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-      
-      // Sync user
-      dbUser = await syncUserWithNeon(clerkId, email, name);
+    try {
+      const { auth, currentUser } = await import("@clerk/nextjs/server");
+      const { syncUserWithNeon } = await import("@/lib/user-sync");
+      const { db } = await import("@/db");
+      const { careerAudits, users } = await import("@/db/schema");
+      const { eq } = await import("drizzle-orm");
 
-      // Save audit
-      const [savedAudit] = await db.insert(careerAudits).values({
-        userId: dbUser.id,
-        readinessScore: audit.readiness_score,
-        marketMatchScore: audit.market_match_score,
-        projectQualityScore: audit.project_quality_score,
-        skillMap: audit.skill_map,
-        atsKeywordAnalysis: {
-          recommendations: audit.ats_recommendations,
-          skill_gaps: audit.skill_gaps,
-          depth_vs_breadth: audit.depth_vs_breadth,
-          market_alignment: audit.market_alignment_insights
-        },
-        githubAnalysis: githubStats,
-      }).returning();
-      
-      savedAuditId = savedAudit.id;
+      const { userId: clerkId } = await auth();
+      const user = await currentUser();
 
-      // Update user's last audit time
-      await db.update(users)
-        .set({ lastAuditAt: new Date() })
-        .where(eq(users.id, dbUser.id));
+      if (clerkId && user) {
+        const email = user.emailAddresses[0].emailAddress;
+        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        dbUser = await syncUserWithNeon(clerkId, email, name);
+
+        const [savedAudit] = await db.insert(careerAudits).values({
+          userId: dbUser.id,
+          readinessScore: audit.readiness_score,
+          marketMatchScore: audit.market_match_score,
+          projectQualityScore: audit.project_quality_score,
+          skillMap: audit.skill_map,
+          atsKeywordAnalysis: {
+            recommendations: audit.ats_recommendations,
+            skill_gaps: audit.skill_gaps,
+            depth_vs_breadth: audit.depth_vs_breadth,
+            market_alignment: audit.market_alignment_insights,
+          },
+          githubAnalysis: githubStats,
+        }).returning();
+
+        savedAuditId = savedAudit.id;
+
+        await db.update(users)
+          .set({ lastAuditAt: new Date() })
+          .where(eq(users.id, dbUser.id));
+      }
+    } catch (dbError) {
+      console.warn("DB persistence failed:", dbError);
     }
 
     return NextResponse.json({
@@ -141,6 +168,7 @@ export async function POST(req: NextRequest) {
       data: {
         s3_url: s3Url,
         file_name: file.name,
+        parsed_data: parsedResume,
         audit,
         github: githubStats,
         embedding: embedding.length > 0 ? embedding : undefined,

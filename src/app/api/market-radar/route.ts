@@ -33,8 +33,16 @@ OUTPUT: Return EXACTLY this JSON:
 
 export async function GET(req: NextRequest) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: "GEMINI_API_KEY is not configured" },
+        { status: 500 }
+      );
+    }
+
     const model = getAI().getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: MARKET_RADAR_PROMPT,
     });
 

@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Target,
   FileText,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -356,18 +357,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
-const Zap = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M4 14.752V3a1 1 0 0 1 1.574-.816l13 9a1 1 0 0 1 0 1.632l-13 9A1 1 0 0 1 4 21v-6.248" />
-  </svg>
-);

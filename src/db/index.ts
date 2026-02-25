@@ -4,15 +4,11 @@ import * as schema from './schema';
 
 const databaseUrl = process.env.DATABASE_URL;
 
-// Create a function to get the db instance, or a dummy if we're in build time
 function createDb() {
   if (!databaseUrl) {
-    if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
-      console.warn("DATABASE_URL is missing. DB operations will fail.");
-    }
-    // Return a dummy object or throw a descriptive error on access
-    // For build-time static generation, we might need a workaround
-    return drizzle(neon("http://placeholder-url-for-build-time"), { schema });
+    console.warn("DATABASE_URL is missing. DB operations will fail at runtime.");
+    // Return a proxy that throws a descriptive error on any property access that leads to a call
+    return drizzle(neon("postgresql://placeholder:placeholder@localhost/placeholder"), { schema });
   }
 
   const sql = neon(databaseUrl);
