@@ -119,9 +119,10 @@ export async function POST(req: NextRequest) {
       console.warn("Embedding generation failed:", embError);
     }
 
-    // 6. DB Persistence — best effort, non-blocking
+    // 6. DB Persistence — critical for dashboard to show audit
     let dbUser = null;
     let savedAuditId = null;
+    let dbSaveError = null;
 
     try {
       const { auth, currentUser } = await import("@clerk/nextjs/server");
@@ -138,17 +139,22 @@ export async function POST(req: NextRequest) {
         const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
         dbUser = await syncUserWithNeon(clerkId, email, name);
 
+        // Ensure scores are valid numbers
+        const readiness = typeof audit.readiness_score === 'number' ? audit.readiness_score : parseInt(audit.readiness_score) || 0;
+        const marketMatch = typeof audit.market_match_score === 'number' ? audit.market_match_score : parseInt(audit.market_match_score) || 0;
+        const projectQuality = typeof audit.project_quality_score === 'number' ? audit.project_quality_score : parseInt(audit.project_quality_score) || 0;
+
         const [savedAudit] = await db.insert(careerAudits).values({
           userId: dbUser.id,
-          readinessScore: audit.readiness_score,
-          marketMatchScore: audit.market_match_score,
-          projectQualityScore: audit.project_quality_score,
-          skillMap: audit.skill_map,
+          readinessScore: readiness,
+          marketMatchScore: marketMatch,
+          projectQualityScore: projectQuality,
+          skillMap: audit.skill_map || {},
           atsKeywordAnalysis: {
-            recommendations: audit.ats_recommendations,
-            skill_gaps: audit.skill_gaps,
-            depth_vs_breadth: audit.depth_vs_breadth,
-            market_alignment: audit.market_alignment_insights,
+            recommendations: audit.ats_recommendations || [],
+            skill_gaps: audit.skill_gaps || [],
+            depth_vs_breadth: audit.depth_vs_breadth || "",
+            market_alignment: audit.market_alignment_insights || "",
           },
           githubAnalysis: githubStats,
         }).returning();
@@ -158,9 +164,13 @@ export async function POST(req: NextRequest) {
         await db.update(users)
           .set({ lastAuditAt: new Date() })
           .where(eq(users.id, dbUser.id));
+      } else {
+        dbSaveError = "User not authenticated — audit not saved to database";
+        console.warn(dbSaveError);
       }
     } catch (dbError) {
-      console.warn("DB persistence failed:", dbError);
+      dbSaveError = dbError instanceof Error ? dbError.message : "DB persistence failed";
+      console.error("DB persistence failed:", dbError);
     }
 
     return NextResponse.json({
@@ -174,6 +184,8 @@ export async function POST(req: NextRequest) {
         embedding: embedding.length > 0 ? embedding : undefined,
         auditId: savedAuditId,
         userId: dbUser?.id,
+        dbSaved: !!savedAuditId,
+        dbSaveError: dbSaveError || undefined,
       },
     });
   } catch (error: unknown) {

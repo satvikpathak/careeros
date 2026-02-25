@@ -47,6 +47,17 @@ export async function GET(req: NextRequest) {
         where: eq(skillProgress.userId, dbUser.id),
       });
 
+      // Normalize audit data to ensure consistent camelCase field names
+      // This handles edge cases where data might have been stored differently
+      const normalizedAudit = latestAudit ? {
+        ...latestAudit,
+        readinessScore: latestAudit.readinessScore ?? (latestAudit as any).readiness_score ?? 0,
+        marketMatchScore: latestAudit.marketMatchScore ?? (latestAudit as any).market_match_score ?? 0,
+        projectQualityScore: latestAudit.projectQualityScore ?? (latestAudit as any).project_quality_score ?? 0,
+        skillMap: latestAudit.skillMap ?? (latestAudit as any).skill_map ?? {},
+        atsKeywordAnalysis: latestAudit.atsKeywordAnalysis ?? (latestAudit as any).ats_keyword_analysis ?? {},
+      } : null;
+
       return NextResponse.json({
         success: true,
         data: {
@@ -57,7 +68,7 @@ export async function GET(req: NextRequest) {
             streak: dbUser.streakCount,
             tier: dbUser.subscriptionTier,
           },
-          audit: latestAudit || null,
+          audit: normalizedAudit,
           sprint: latestSprint || null,
           projects: userProjects,
           skillProgress: progress,
