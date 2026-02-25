@@ -13,6 +13,8 @@ import {
   X,
   Compass,
   MapIcon,
+  BookOpen,
+  Map,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,8 @@ const navItems = [
   { href: "/dashboard/chat", label: "AI Interview", icon: Bot },
   { href: "/dashboard/resume", label: "Intelligence Audit", icon: FileText },
   { href: "/dashboard/jobs", label: "Job Radar", icon: Briefcase },
+  { href: "/dashboard/resources", label: "Resources", icon: BookOpen },
+  { href: "/dashboard/roadmap", label: "Roadmap", icon: Map },
 ];
 
 export default function DashboardLayout({

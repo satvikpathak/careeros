@@ -15,6 +15,7 @@ import {
   Target,
   TrendingUp,
   X,
+  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { useProfileStore } from "@/stores/profile-store";
 import type { ParsedResume } from "@/lib/types";
 import { ROLE_CONFIGS, calculateATSScore } from "@/lib/constants";
+import Link from "next/link";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -45,6 +47,7 @@ export default function ResumePage() {
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState("Software Engineer");
+  const [auditSaved, setAuditSaved] = useState(false);
 
   const processFile = async (file: File) => {
     if (file.type !== "application/pdf") {
@@ -61,10 +64,12 @@ export default function ResumePage() {
     setFileName(file.name);
     setUploading(true);
     setParsing(true);
+    setAuditSaved(false);
 
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("targetRole", selectedRole);
 
       const response = await fetch("/api/resume", {
         method: "POST",
@@ -76,6 +81,13 @@ export default function ResumePage() {
       if (data.success) {
         const parsed: ParsedResume = data.data.parsed_data;
         setParsedResume(parsed);
+
+        // Track whether audit was saved to DB
+        if (data.data.dbSaved) {
+          setAuditSaved(true);
+        } else if (data.data.dbSaveError) {
+          console.warn("Audit DB save issue:", data.data.dbSaveError);
+        }
 
         // Calculate ATS score
         const roleConfig = ROLE_CONFIGS[selectedRole];
@@ -130,6 +142,28 @@ export default function ResumePage() {
 
   return (
     <div className="space-y-6">
+      {/* Success Banner */}
+      {auditSaved && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+            <div>
+              <p className="font-semibold text-emerald-800">Career Audit Saved!</p>
+              <p className="text-sm text-emerald-600">Your audit is now visible on your dashboard.</p>
+            </div>
+          </div>
+          <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+            <Link href="/dashboard">
+              View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </Button>
+        </motion.div>
+      )}
+
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeIn}>
         <h1 className="text-2xl font-bold text-gray-900">Resume Analysis</h1>

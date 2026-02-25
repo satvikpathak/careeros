@@ -33,6 +33,8 @@ import {
   Loader2,
   RefreshCw,
   FileText,
+  BookOpen,
+  Map,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -447,6 +449,34 @@ export default function DashboardPage() {
                    </div>
                 </div>
              </div>
+          </div>
+
+          {/* Quick Access: Resources & Roadmap */}
+          <div className="mt-8 grid md:grid-cols-2 gap-4">
+            <Link href="/dashboard/resources">
+              <div className="glass-card p-6 rounded-2xl flex items-center gap-4 border border-blue-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-6 h-6 text-blue-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">Learning Resources</h3>
+                  <p className="text-sm text-gray-500">YouTube playlists, courses, and articles curated by AI</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
+            <Link href="/dashboard/roadmap">
+              <div className="glass-card p-6 rounded-2xl flex items-center gap-4 border border-purple-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Map className="w-6 h-6 text-purple-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">Learning Roadmap</h3>
+                  <p className="text-sm text-gray-500">Step-by-step learning paths for any technology</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
           </div>
         </motion.div>
       </div>
