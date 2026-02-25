@@ -2,20 +2,32 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Play, Youtube, ExternalLink } from "lucide-react";
+import { Play, Youtube, ExternalLink, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface YouTubePlaylistProps {
   playlists: {
     title: string;
     link: string;
-    thumbnail: string;
+    thumbnail?: string;
     channel: string;
     video_count?: string;
     description?: string;
+    search_query?: string;
   }[];
+}
+
+function getGradient(index: number): string {
+  const gradients = [
+    "from-red-500 to-orange-500",
+    "from-pink-500 to-rose-500",
+    "from-violet-500 to-purple-500",
+    "from-blue-500 to-indigo-500",
+    "from-emerald-500 to-teal-500",
+    "from-amber-500 to-yellow-500",
+  ];
+  return gradients[index % gradients.length];
 }
 
 export default function YouTubePlaylist({ playlists }: YouTubePlaylistProps) {
@@ -31,81 +43,72 @@ export default function YouTubePlaylist({ playlists }: YouTubePlaylistProps) {
     );
   }
 
-  const displayedPlaylists = showAll ? playlists : playlists.slice(0, 3);
+  const displayedPlaylists = showAll ? playlists : playlists.slice(0, 4);
 
   return (
     <Card className="glass-card border-0 shadow-xl overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-500 to-pink-500" />
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-bold flex items-center gap-2">
           <Youtube className="w-5 h-5 text-red-500" /> YouTube Playlists
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-120 overflow-y-auto pr-1">
           {displayedPlaylists.map((playlist, index) => (
-            <motion.div
+            <motion.a
               key={index}
+              href={playlist.link}
+              target="_blank"
+              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               whileHover={{ scale: 1.01 }}
-              className="flex gap-4 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 hover:border-gray-200 transition-all duration-200 group cursor-pointer"
+              className="flex gap-4 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 hover:border-red-100 transition-all duration-200 group cursor-pointer"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* Thumbnail */}
-              <a
-                href={playlist.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative flex-shrink-0 w-[140px] h-[80px] rounded-lg overflow-hidden bg-gray-200"
-              >
-                <img
-                  src={playlist.thumbnail}
-                  alt={playlist.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='80' fill='%23f3f4f6'%3E%3Crect width='140' height='80' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='12'%3EVideo%3C/text%3E%3C/svg%3E";
-                  }}
-                />
+              <div className={`relative shrink-0 w-20 h-20 rounded-xl bg-linear-to-br ${getGradient(index)} flex items-center justify-center shadow-lg`}>
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: hoveredIndex === index ? 1 : 0 }}
-                  className="absolute inset-0 bg-black/60 flex items-center justify-center"
+                  animate={{ scale: hoveredIndex === index ? 1.1 : 1 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <Play className="w-6 h-6 text-white fill-white" />
+                  {hoveredIndex === index ? (
+                    <Play className="w-8 h-8 text-white fill-white" />
+                  ) : (
+                    <Youtube className="w-8 h-8 text-white" />
+                  )}
                 </motion.div>
-                <div className="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] text-white font-medium">
+                <div className="absolute -bottom-1 -right-1 bg-white px-1.5 py-0.5 rounded-md text-[9px] text-gray-600 font-bold shadow-sm border border-gray-100">
                   {playlist.video_count || "Playlist"}
                 </div>
-              </a>
+              </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
+              <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-red-600 transition-colors">
+                  <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-red-600 transition-colors leading-tight">
                     {playlist.title}
                   </h4>
-                  <p className="text-xs text-gray-500 mt-0.5">{playlist.channel}</p>
-                  {playlist.description && (
-                    <p className="text-xs text-gray-400 mt-1 line-clamp-1">{playlist.description}</p>
-                  )}
+                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <Youtube className="w-3 h-3 text-red-400" />
+                    {playlist.channel}
+                  </p>
                 </div>
-                <a
-                  href={playlist.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 mt-1"
-                >
-                  Watch <ExternalLink className="w-3 h-3" />
-                </a>
+                {playlist.description && (
+                  <p className="text-xs text-gray-400 mt-1 line-clamp-1">{playlist.description}</p>
+                )}
+                <div className="flex items-center gap-1 text-xs font-medium text-red-500 group-hover:text-red-600 mt-1">
+                  <Search className="w-3 h-3" />
+                  Search on YouTube
+                  <ExternalLink className="w-3 h-3 ml-0.5" />
+                </div>
               </div>
-            </motion.div>
+            </motion.a>
           ))}
         </div>
 
-        {playlists.length > 3 && (
+        {playlists.length > 4 && (
           <Button
             variant="ghost"
             onClick={() => setShowAll(!showAll)}
