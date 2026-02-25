@@ -15,6 +15,7 @@ async function listModels() {
     // Note: listModels doesn't take an apiVersion in the same way, 
     // it depends on how the client is initialized, or you can use the REST API.
     // In the SDK, it usually uses v1beta for listModels.
+    // @ts-expect-error - listModels may not exist on all SDK versions
     const models = await genAI.listModels();
     for (const model of models.models) {
       console.log(`Name: ${model.name}, Methods: ${model.supportedGenerationMethods.join(", ")}`);

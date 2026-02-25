@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useProfileStore } from "@/stores/profile-store";
+import { useRoadmapStore } from "@/stores/roadmap-store";
 import type { ParsedResume } from "@/lib/types";
 import { ROLE_CONFIGS, calculateATSScore } from "@/lib/constants";
 import Link from "next/link";
@@ -48,6 +49,51 @@ export default function ResumePage() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState("Software Engineer");
   const [auditSaved, setAuditSaved] = useState(false);
+  const [roadmapStatus, setRoadmapStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+
+  const { setRoadmap, setAuditContext, setGenerating: setRoadmapGenerating } = useRoadmapStore();
+
+  // Auto-generate roadmap from audit data
+  const generateRoadmapFromAudit = async (
+    audit: { skill_map?: Record<string, number>; skill_gaps?: string[] },
+    parsed: ParsedResume,
+    role: string
+  ) => {
+    setRoadmapStatus("generating");
+    setRoadmapGenerating(true);
+
+    try {
+      const currentSkills = parsed.skills || Object.keys(audit.skill_map || {});
+      const skillGaps = audit.skill_gaps || parsed.missing_keywords || [];
+
+      // Store context for later use
+      setAuditContext(skillGaps, currentSkills, role);
+
+      const topic = `${role} career path focusing on: ${skillGaps.slice(0, 5).join(", ")}`;
+
+      const res = await fetch("/api/roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic,
+          currentSkills,
+          targetRole: role,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success && json.data) {
+        setRoadmap(json.data, "auto");
+        setRoadmapStatus("done");
+      } else {
+        setRoadmapStatus("error");
+      }
+    } catch {
+      setRoadmapStatus("error");
+    } finally {
+      setRoadmapGenerating(false);
+    }
+  };
 
   const processFile = async (file: File) => {
     if (file.type !== "application/pdf") {
@@ -85,8 +131,12 @@ export default function ResumePage() {
         // Track whether audit was saved to DB
         if (data.data.dbSaved) {
           setAuditSaved(true);
+          // Auto-generate personalized roadmap from audit data
+          generateRoadmapFromAudit(data.data.audit, parsed, selectedRole);
         } else if (data.data.dbSaveError) {
           console.warn("Audit DB save issue:", data.data.dbSaveError);
+          // Still generate roadmap even if DB save failed
+          generateRoadmapFromAudit(data.data.audit, parsed, selectedRole);
         }
 
         // Calculate ATS score
@@ -153,14 +203,32 @@ export default function ResumePage() {
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             <div>
               <p className="font-semibold text-emerald-800">Career Audit Saved!</p>
-              <p className="text-sm text-emerald-600">Your audit is now visible on your dashboard.</p>
+              <p className="text-sm text-emerald-600">
+                {roadmapStatus === "generating"
+                  ? "Generating your personalized roadmap..."
+                  : roadmapStatus === "done"
+                  ? "Your roadmap is ready! Check it on the Roadmap page."
+                  : "Your audit is now visible on your dashboard."}
+              </p>
             </div>
           </div>
-          <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
-            <Link href="/dashboard">
-              View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            {roadmapStatus === "generating" && (
+              <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+            )}
+            {roadmapStatus === "done" && (
+              <Button asChild size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl">
+                <Link href="/dashboard/roadmap">
+                  View Roadmap <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
+            )}
+            <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+              <Link href="/dashboard">
+                View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
         </motion.div>
       )}
 

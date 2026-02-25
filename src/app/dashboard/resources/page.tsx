@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -36,6 +37,14 @@ const SUGGESTED_TOPICS = [
 ];
 
 export default function ResourcesPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-indigo-400 animate-spin" /></div>}>
+      <ResourcesContent />
+    </Suspense>
+  );
+}
+
+function ResourcesContent() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +55,16 @@ export default function ResourcesPage() {
   useEffect(() => {
     fetchSkillGaps();
   }, []);
+
+  // Auto-search if topic param is provided (e.g., linked from roadmap)
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const topicParam = searchParams.get("topic");
+    if (topicParam && !resources) {
+      setQuery(topicParam);
+      searchResources(topicParam);
+    }
+  }, [searchParams]);
 
   const fetchSkillGaps = async () => {
     try {
@@ -195,7 +214,7 @@ export default function ResourcesPage() {
       {error && (
         <Card className="border-red-200 bg-red-50">
           <CardContent className="p-4 flex items-center gap-3 text-red-600">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 shrink-0" />
             <p className="font-medium">{error}</p>
           </CardContent>
         </Card>
