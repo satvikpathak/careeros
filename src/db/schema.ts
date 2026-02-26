@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, jsonb, decimal, varchar } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, jsonb, decimal, varchar, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -52,5 +52,21 @@ export const projects = pgTable("projects", {
   architecture: jsonb("architecture"),
   deploymentGuide: text("deployment_guide"),
   resumePoints: jsonb("resume_points"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const roadmaps = pgTable("roadmaps", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  title: varchar("title", { length: 500 }),
+  topic: varchar("topic", { length: 500 }),
+  targetRole: varchar("target_role", { length: 255 }),
+  estimatedDuration: varchar("estimated_duration", { length: 100 }),
+  difficulty: varchar("difficulty", { length: 100 }),
+  steps: jsonb("steps"), // Array of { phase, description, topics[], projects[], milestones[] }
+  sourceType: varchar("source_type", { length: 20 }), // "auto" | "manual"
+  completedPhases: jsonb("completed_phases"), // Record<number, boolean>
+  topicChecklist: jsonb("topic_checklist"), // Record<number, Record<number, boolean>>
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });

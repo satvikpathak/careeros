@@ -5,6 +5,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAI } from "@/lib/gemini";
 
+// GET — Load user's active roadmap from DB
+export async function GET(req: NextRequest) {
+  try {
+    const { auth, currentUser } = await import("@clerk/nextjs/server");
+    const { syncUserWithNeon } = await import("@/lib/user-sync");
+    const { db } = await import("@/db");
+    const { roadmaps } = await import("@/db/schema");
+    const { eq, and, desc } = await import("drizzle-orm");
+
+    const { userId: clerkId } = await auth();
+    const user = await currentUser();
+
+    if (!clerkId || !user) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    const email = user.emailAddresses[0].emailAddress;
+    const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const dbUser = await syncUserWithNeon(clerkId, email, name);
+
+    const activeRoadmap = await db.query.roadmaps.findFirst({
+      where: and(eq(roadmaps.userId, dbUser.id), eq(roadmaps.isActive, true)),
+      orderBy: [desc(roadmaps.createdAt)],
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: activeRoadmap || null,
+    });
+  } catch (error: unknown) {
+    console.error("Load roadmap error:", error);
+    return NextResponse.json({
+      success: true,
+      data: null,
+    });
+  }
+}
+
 const ROADMAP_PROMPT = `You are the Career Roadmap Generator for CareerOS 2.0.
 Generate a detailed, phased learning roadmap for any technology or career path.
 
@@ -82,9 +120,53 @@ Make it practical, actionable, and progressive from fundamentals to advanced top
       );
     }
 
+    // Persist roadmap to DB
+    let savedRoadmapId = null;
+    try {
+      const { auth, currentUser } = await import("@clerk/nextjs/server");
+      const { syncUserWithNeon } = await import("@/lib/user-sync");
+      const { db } = await import("@/db");
+      const { roadmaps } = await import("@/db/schema");
+      const { eq, and } = await import("drizzle-orm");
+
+      const { userId: clerkId } = await auth();
+      const user = await currentUser();
+
+      if (clerkId && user) {
+        const email = user.emailAddresses[0].emailAddress;
+        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        const dbUser = await syncUserWithNeon(clerkId, email, name);
+
+        // Deactivate previous roadmaps for this user
+        await db.update(roadmaps)
+          .set({ isActive: false })
+          .where(eq(roadmaps.userId, dbUser.id));
+
+        // Save new roadmap
+        const [saved] = await db.insert(roadmaps).values({
+          userId: dbUser.id,
+          title: roadmap.title || topic,
+          topic: topic,
+          targetRole: targetRole || null,
+          estimatedDuration: roadmap.estimated_duration || null,
+          difficulty: roadmap.difficulty || null,
+          steps: roadmap.steps || [],
+          sourceType: currentSkills?.length ? "auto" : "manual",
+          completedPhases: {},
+          topicChecklist: {},
+          isActive: true,
+        }).returning();
+
+        savedRoadmapId = saved.id;
+      }
+    } catch (dbError) {
+      console.warn("Roadmap DB persistence failed:", dbError);
+    }
+
     return NextResponse.json({
       success: true,
       data: roadmap,
+      roadmapId: savedRoadmapId,
     });
   } catch (error: unknown) {
     console.error("Roadmap generation error:", error);

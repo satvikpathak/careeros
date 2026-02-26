@@ -216,6 +216,46 @@ export const useRoadmapStore = create<RoadmapState>()(
         currentSkills: state.currentSkills,
         targetRole: state.targetRole,
       }),
+      onRehydrateStorage: () => {
+        return (_state, _error) => {
+          // After rehydration, no-op — DB sync happens on actions
+        };
+      },
     }
   )
+);
+
+// Debounced sync of progress to DB
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+
+function syncProgressToDb() {
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      const state = useRoadmapStore.getState();
+      if (!state.roadmap) return;
+      await fetch("/api/roadmap/progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          completedPhases: state.completedPhases,
+          topicChecklist: state.topicChecklist,
+        }),
+      });
+    } catch {
+      // Silent fail — local state is still saved via Zustand persist
+    }
+  }, 2000);
+}
+
+// Subscribe to changes that should sync to DB
+useRoadmapStore.subscribe(
+  (state, prevState) => {
+    if (
+      state.completedPhases !== prevState.completedPhases ||
+      state.topicChecklist !== prevState.topicChecklist
+    ) {
+      syncProgressToDb();
+    }
+  }
 );
