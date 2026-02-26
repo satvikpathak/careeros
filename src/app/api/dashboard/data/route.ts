@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
     // Try DB operations; return empty data if DB is unavailable
     try {
       const { db } = await import("@/db");
-      const { users, careerAudits, weeklySprints, projects, skillProgress } = await import("@/db/schema");
-      const { eq, desc } = await import("drizzle-orm");
+      const { users, careerAudits, weeklySprints, projects, skillProgress, roadmaps } = await import("@/db/schema");
+      const { eq, desc, and } = await import("drizzle-orm");
       const { syncUserWithNeon } = await import("@/lib/user-sync");
 
       const dbUser = await syncUserWithNeon(clerkId, email, name);
@@ -45,6 +45,12 @@ export async function GET(req: NextRequest) {
 
       const progress = await db.query.skillProgress.findMany({
         where: eq(skillProgress.userId, dbUser.id),
+      });
+
+      // Load active roadmap
+      const activeRoadmap = await db.query.roadmaps.findFirst({
+        where: and(eq(roadmaps.userId, dbUser.id), eq(roadmaps.isActive, true)),
+        orderBy: [desc(roadmaps.createdAt)],
       });
 
       // Normalize audit data to ensure consistent camelCase field names
@@ -72,6 +78,18 @@ export async function GET(req: NextRequest) {
           sprint: latestSprint || null,
           projects: userProjects,
           skillProgress: progress,
+          roadmap: activeRoadmap ? {
+            id: activeRoadmap.id,
+            title: activeRoadmap.title,
+            topic: activeRoadmap.topic,
+            targetRole: activeRoadmap.targetRole,
+            estimatedDuration: activeRoadmap.estimatedDuration,
+            difficulty: activeRoadmap.difficulty,
+            steps: activeRoadmap.steps,
+            sourceType: activeRoadmap.sourceType,
+            completedPhases: activeRoadmap.completedPhases || {},
+            topicChecklist: activeRoadmap.topicChecklist || {},
+          } : null,
         },
       });
     } catch (dbError) {
@@ -90,6 +108,7 @@ export async function GET(req: NextRequest) {
           sprint: null,
           projects: [],
           skillProgress: [],
+          roadmap: null,
         },
       });
     }

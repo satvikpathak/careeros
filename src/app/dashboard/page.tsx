@@ -42,6 +42,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
+import { useRoadmapStore } from "@/stores/roadmap-store";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -52,6 +53,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("sprints");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const { setRoadmap, setAuditContext, roadmap: storeRoadmap } = useRoadmapStore();
 
   useEffect(() => {
     fetchDashboardData();
@@ -64,6 +66,27 @@ export default function DashboardPage() {
       const json = await res.json();
       if (json.success) {
         setData(json.data);
+
+        // Hydrate roadmap store from DB if we have a roadmap but store is empty
+        if (json.data.roadmap && !storeRoadmap) {
+          const rm = json.data.roadmap;
+          setRoadmap(
+            {
+              title: rm.title || "",
+              estimated_duration: rm.estimatedDuration || "",
+              difficulty: rm.difficulty || "",
+              steps: (rm.steps as any[]) || [],
+            },
+            (rm.sourceType as "auto" | "manual") || "auto"
+          );
+          // Restore audit context for roadmap
+          if (json.data.audit) {
+            const audit = json.data.audit;
+            const skillGaps = audit.atsKeywordAnalysis?.skill_gaps || [];
+            const currentSkills = Object.keys(audit.skillMap || {});
+            setAuditContext(skillGaps, currentSkills, rm.targetRole || "");
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);

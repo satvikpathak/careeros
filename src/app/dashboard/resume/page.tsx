@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -50,8 +50,44 @@ export default function ResumePage() {
   const [selectedRole, setSelectedRole] = useState("Software Engineer");
   const [auditSaved, setAuditSaved] = useState(false);
   const [roadmapStatus, setRoadmapStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+  const [previousAudit, setPreviousAudit] = useState<any>(null);
+  const [loadingPrevious, setLoadingPrevious] = useState(true);
 
   const { setRoadmap, setAuditContext, setGenerating: setRoadmapGenerating } = useRoadmapStore();
+
+  // Load previous audit on mount so user sees their last audit
+  useEffect(() => {
+    const loadPreviousAudit = async () => {
+      try {
+        const res = await fetch("/api/dashboard/data");
+        const json = await res.json();
+        if (json.success && json.data?.audit) {
+          setPreviousAudit(json.data.audit);
+          // Also hydrate the profile store if we have parsed data
+          const audit = json.data.audit;
+          const skills = audit.skillMap ? Object.keys(audit.skillMap) : [];
+          if (skills.length > 0 && !parsedResume) {
+            setParsedResume({
+              skills,
+              experience_years: "N/A",
+              education: [],
+              projects: [],
+              strength_score: audit.readinessScore || 0,
+              missing_keywords: audit.atsKeywordAnalysis?.skill_gaps || [],
+              summary: audit.atsKeywordAnalysis?.depth_vs_breadth || "",
+            });
+            setAtsScore(audit.marketMatchScore || 0);
+            setAuditSaved(true);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load previous audit:", err);
+      } finally {
+        setLoadingPrevious(false);
+      }
+    };
+    loadPreviousAudit();
+  }, []);
 
   // Auto-generate roadmap from audit data
   const generateRoadmapFromAudit = async (
@@ -192,6 +228,40 @@ export default function ResumePage() {
 
   return (
     <div className="space-y-6">
+      {/* Loading previous audit */}
+      {loadingPrevious && (
+        <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+          <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+          <p className="text-sm font-medium text-indigo-700">Loading your previous audit data...</p>
+        </div>
+      )}
+
+      {/* Previous audit banner */}
+      {previousAudit && !parsedResume && !loadingPrevious && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <Target className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="font-semibold text-blue-800">Previous Audit Found</p>
+              <p className="text-sm text-blue-600">
+                Readiness: {previousAudit.readinessScore}% • Market Match: {previousAudit.marketMatchScore}% • Project Quality: {previousAudit.projectQualityScore}%
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+              <Link href="/dashboard">
+                View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
       {/* Success Banner */}
       {auditSaved && (
         <motion.div

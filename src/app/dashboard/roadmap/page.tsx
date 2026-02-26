@@ -403,6 +403,32 @@ export default function RoadmapPage() {
   const [visibleCount, setVisibleCount] = useState(0);
   const [quizModal, setQuizModal] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<Record<number, "topics" | "resources" | "quiz">>({});
+  const [dbLoading, setDbLoading] = useState(false);
+
+  // Load roadmap from DB if Zustand store is empty (e.g. fresh login / new tab)
+  useEffect(() => {
+    if (!roadmap && !isGenerating) {
+      setDbLoading(true);
+      fetch("/api/roadmap")
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data) {
+            const rm = json.data;
+            setRoadmap(
+              {
+                title: rm.title || "",
+                estimated_duration: rm.estimatedDuration || rm.estimated_duration || "",
+                difficulty: rm.difficulty || "",
+                steps: (rm.steps as any[]) || [],
+              },
+              (rm.sourceType || rm.source_type || "auto") as "auto" | "manual"
+            );
+          }
+        })
+        .catch(() => {})
+        .finally(() => setDbLoading(false));
+    }
+  }, []);
 
   // Animate phases on mount when roadmap exists
   useEffect(() => {
@@ -502,7 +528,7 @@ export default function RoadmapPage() {
   };
 
   const overallProgress = getOverallProgress();
-  const loading = isGenerating || searchLoading;
+  const loading = isGenerating || searchLoading || dbLoading;
 
   return (
     <div className="space-y-8 pb-10">
