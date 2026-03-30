@@ -158,7 +158,7 @@ export async function chatWithGemini(
   }));
 
   // Ensure history[0].role === 'user'
-  let userIndex = history.findIndex(h => h.role === "user");
+  const userIndex = history.findIndex(h => h.role === "user");
   if (userIndex !== -1) {
     history = history.slice(userIndex);
   } else {
