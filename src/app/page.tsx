@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -23,12 +23,23 @@ import SplineScene from "@/components/SplineScene";
 import CloudBackground from "@/components/CloudBackground";
 import GlossyButton from "@/components/GlossyButton";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import AppNavbar from "@/components/navigation/AppNavbar";
 
 
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0 },
+};
+
+const revealChar: Variants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(12px)" },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { delay: i * 0.03, duration: 0.6, ease: [0.22, 0.8, 0.2, 1] },
+  }),
 };
 
 const staggerContainer = {
@@ -40,35 +51,20 @@ const staggerContainer = {
 };
 
 export default function LandingPage() {
+  const navLinks = [
+    { href: "#features", label: "Features" },
+    { href: "#how-it-works", label: "How it Works" },
+    { href: "#testimonials", label: "Testimonials" },
+  ];
+
   return (
     <div className="min-h-screen overflow-hidden relative">
       <CloudBackground />
-
-      {/* ========== Navbar ========== */}
-      <nav className="fixed top-6 left-0 right-0 z-50 flex justify-center px-6">
-        <div className="max-w-7xl w-full h-16 glass-premium glass-liquid rounded-full flex items-center justify-between px-8 shadow-2xl">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white drop-shadow-md">
-              Career<span className="text-indigo-300">OS</span>
-            </span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#how-it-works" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-              How it Works
-            </a>
-            <a href="#testimonials" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-              Testimonials
-            </a>
-          </div>
-
-          <div className="flex items-center gap-4">
+      <AppNavbar
+        links={navLinks}
+        variant="dark"
+        rightSlot={(
+          <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
                 <GlossyButton variant="secondary" className="h-10 px-6 text-sm">
@@ -82,7 +78,7 @@ export default function LandingPage() {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/dashboard" className="text-sm font-medium text-white/70 hover:text-white transition-colors mr-2">
+              <Link href="/dashboard" className="text-sm font-semibold text-white/80 hover:text-white transition-colors mr-2">
                 Dashboard
               </Link>
               <UserButton 
@@ -95,8 +91,8 @@ export default function LandingPage() {
               />
             </SignedIn>
           </div>
-        </div>
-      </nav>
+        )}
+      />
 
       {/* ========== Hero Section ========== */}
       <section className="relative pt-32 pb-20 px-6">
@@ -121,23 +117,44 @@ export default function LandingPage() {
               className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9] mb-8 drop-shadow-2xl"
             >
               {"Your Career,".split("").map((char, i) => (
-                <span key={i} className="text-reveal-char" style={{ animationDelay: `${i * 0.03}s` }}>
+                <motion.span
+                  key={i}
+                  custom={i}
+                  variants={revealChar}
+                  initial="hidden"
+                  animate="visible"
+                  className="inline-block"
+                >
                   {char === " " ? "\u00A0" : char}
-                </span>
+                </motion.span>
               ))}
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-blue-300">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-300 via-purple-300 to-blue-300">
                 {"Intelligently".split("").map((char, i) => (
-                  <span key={i} className="text-reveal-char" style={{ animationDelay: `${(i + 13) * 0.03}s` }}>
+                  <motion.span
+                    key={i}
+                    custom={i + 13}
+                    variants={revealChar}
+                    initial="hidden"
+                    animate="visible"
+                    className="inline-block"
+                  >
                     {char === " " ? "\u00A0" : char}
-                  </span>
+                  </motion.span>
                 ))}
               </span>
               <br />
               {"Guided by AI".split("").map((char, i) => (
-                <span key={i} className="text-reveal-char" style={{ animationDelay: `${(i + 26) * 0.03}s` }}>
+                <motion.span
+                  key={i}
+                  custom={i + 26}
+                  variants={revealChar}
+                  initial="hidden"
+                  animate="visible"
+                  className="inline-block"
+                >
                   {char === " " ? "\u00A0" : char}
-                </span>
+                </motion.span>
               ))}
             </motion.h1>
 
@@ -160,17 +177,21 @@ export default function LandingPage() {
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
-                <GlossyButton variant="liquid" className="h-16 px-12 text-xl" asChild>
+                <GlossyButton
+                  variant="liquid"
+                  className="h-16 px-12 text-xl shadow-[0_15px_45px_-10px_rgba(79,70,229,0.45)]"
+                  asChild
+                >
                   <Link href="/dashboard">
                     Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </GlossyButton>
               </SignedIn>
-              
+
               <Button
-                variant="ghost"
+                variant="glass"
                 size="lg"
-                className="text-white hover:bg-white/10 h-16 px-12 text-xl font-medium border border-white/10 backdrop-blur-sm rounded-full"
+                className="h-16 px-12 text-xl font-semibold text-indigo-50 bg-white/15 border border-white/30 hover:border-white/60 hover:bg-white/25 rounded-full shadow-[0_12px_40px_-15px_rgba(255,255,255,0.6)]"
                 asChild
               >
                 <Link href="/dashboard/chat">
@@ -212,7 +233,7 @@ export default function LandingPage() {
             className="mt-20 max-w-5xl mx-auto"
           >
             <div className="glass-card rounded-3xl p-2 shadow-2xl shadow-indigo-200/40 bg-[#07072E] border-0 overflow-hidden">
-               <div className="h-[600px] w-full relative">
+               <div className="h-150 w-full relative">
                   <SplineScene />
                   <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end pointer-events-none">
                     <div className="space-y-1">
@@ -358,7 +379,7 @@ export default function LandingPage() {
       </section>
 
       {/* ========== How It Works ========== */}
-      <section id="how-it-works" className="py-24 px-6 bg-gradient-to-b from-transparent via-indigo-50/30 to-transparent">
+  <section id="how-it-works" className="py-24 px-6 bg-linear-to-b from-transparent via-indigo-50/30 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="text-center mb-16"
@@ -493,7 +514,7 @@ export default function LandingPage() {
                   &ldquo;{testimonial.text}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium">
+                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium">
                     {testimonial.name.split(" ").map(n => n[0]).join("")}
                   </div>
                   <div>
@@ -510,7 +531,7 @@ export default function LandingPage() {
       </section>
 
       {/* ========== Stats Section ========== */}
-      <section className="py-20 px-6 bg-gradient-to-b from-transparent via-indigo-50/30 to-transparent">
+  <section className="py-20 px-6 bg-linear-to-b from-transparent via-indigo-50/30 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
@@ -549,7 +570,7 @@ export default function LandingPage() {
             variants={fadeUp}
             className="glass-card rounded-3xl p-12 gradient-border"
           >
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -577,7 +598,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="text-sm font-semibold text-gray-900">
