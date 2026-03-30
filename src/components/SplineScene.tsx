@@ -3,8 +3,18 @@
 import { useEffect, useRef } from "react";
 import { Application } from "@splinetool/runtime";
 import gsap from "gsap";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function SplineScene() {
+type SplineSceneProps = {
+  /** Compact renders shrink height for navbar CTA use */
+  compact?: boolean;
+  /** Optional href to wrap the canvas as a sign-up CTA */
+  href?: string;
+  className?: string;
+};
+
+export default function SplineScene({ compact = false, href, className }: SplineSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const appRef = useRef<Application | null>(null);
 
@@ -47,17 +57,35 @@ export default function SplineScene() {
     };
   }, []);
 
-  return (
-    <div className="w-full h-full min-h-[500px] flex justify-center items-start overflow-hidden bg-[#07072E] rounded-3xl relative">
-      <canvas 
-        id="canvas3d" 
-        ref={canvasRef} 
-        className="w-full h-full outline-none"
+  const content = (
+    <div
+      className={cn(
+        "relative overflow-hidden bg-[#07072E]",
+        compact
+          ? "w-44 h-12 min-h-0 rounded-full flex items-center justify-center"
+          : "w-full h-full min-h-125 flex justify-center items-start rounded-3xl",
+        className
+      )}
+    >
+      <canvas
+        id="canvas3d"
+        ref={canvasRef}
+        className={cn("w-full h-full outline-none", compact ? "scale-110" : undefined)}
       />
-      
+
       {/* Premium Overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#07072E] via-transparent to-transparent opacity-60" />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#07072E]/20 via-transparent to-transparent" />
+  <div className="absolute inset-0 pointer-events-none bg-linear-to-t from-[#07072E] via-transparent to-transparent opacity-60" />
+  <div className="absolute inset-0 pointer-events-none bg-linear-to-b from-[#07072E]/20 via-transparent to-transparent" />
     </div>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="inline-flex" aria-label="Sign up">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }

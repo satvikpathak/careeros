@@ -1,24 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import {
-  LayoutDashboard,
-  Bot,
-  FileText,
-  Briefcase,
-  Sparkles,
-  BookOpen,
-  Map,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import AppNavbar from "@/components/navigation/AppNavbar";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/chat", label: "AI Interview", icon: Bot },
-  { href: "/dashboard/resume", label: "Intelligence Audit", icon: FileText },
-  { href: "/dashboard/jobs", label: "Job Radar", icon: Briefcase },
-  { href: "/dashboard/resources", label: "Resources", icon: BookOpen },
-  { href: "/dashboard/roadmap", label: "Roadmap", icon: Map },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard/chat", label: "AI Interview" },
+  { href: "/dashboard/resume", label: "Intelligence Audit" },
+  { href: "/dashboard/jobs", label: "Job Radar" },
+  { href: "/dashboard/resources", label: "Resources" },
+  { href: "/dashboard/roadmap", label: "Roadmap" },
 ];
 
 export default function DashboardLayout({
