@@ -18,10 +18,7 @@ import {
   Target,
   Rocket,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import SplineScene from "@/components/SplineScene";
 import CloudBackground from "@/components/CloudBackground";
-import GlossyButton from "@/components/GlossyButton";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import AppNavbar from "@/components/navigation/AppNavbar";
 
@@ -62,30 +59,29 @@ export default function LandingPage() {
       <CloudBackground />
       <AppNavbar
         links={navLinks}
-        variant="dark"
         rightSlot={(
           <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
-                <GlossyButton variant="secondary" className="h-10 px-6 text-sm">
-                  Log in
-                </GlossyButton>
+                <button className="text-sm font-semibold text-gray-800 hover:text-black">Log in</button>
               </SignInButton>
+            </SignedOut>
+            <SignedOut>
               <SignUpButton mode="modal">
-                <GlossyButton variant="liquid" className="h-10 px-6 text-sm">
-                  Sign Up <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                </GlossyButton>
+                <span className="inline-flex h-10 items-center justify-center rounded-md bg-black px-4 text-sm font-semibold text-white shadow-md transition hover:shadow-lg">
+                  Sign Up
+                </span>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/dashboard" className="text-sm font-semibold text-white/80 hover:text-white transition-colors mr-2">
+              <Link href="/dashboard" className="text-sm font-semibold text-gray-800 hover:text-black transition-colors mr-2">
                 Dashboard
               </Link>
-              <UserButton 
-                afterSignOutUrl="/" 
+              <UserButton
+                afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    userButtonAvatarBox: "w-9 h-9 border border-white/20"
+                    userButtonAvatarBox: "w-9 h-9 border border-gray-200"
                   }
                 }}
               />
@@ -161,7 +157,7 @@ export default function LandingPage() {
             {/* Subheadline */}
             <motion.p
               variants={fadeUp}
-              className="text-xl sm:text-2xl text-white/70 max-w-2xl mx-auto mb-12 leading-relaxed font-medium"
+              className="text-xl sm:text-2xl text-black/70 max-w-2xl mx-auto mb-12 leading-relaxed font-medium"
             >
               The AI career execution engine. CareerOS conducts readiness audits, 
               generates weekly execution sprints, and builds your portfolio blueprints.
@@ -171,33 +167,26 @@ export default function LandingPage() {
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <SignedOut>
                 <SignUpButton mode="modal">
-                  <GlossyButton variant="liquid" className="h-16 px-12 text-xl">
+                  <span className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40">
                     Get Your Readiness Score <Target className="w-5 h-5 ml-2" />
-                  </GlossyButton>
+                  </span>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
-                <GlossyButton
-                  variant="liquid"
-                  className="h-16 px-12 text-xl shadow-[0_15px_45px_-10px_rgba(79,70,229,0.45)]"
-                  asChild
+                <Link
+                  href="/dashboard"
+                  className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40"
                 >
-                  <Link href="/dashboard">
-                    Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
-                  </Link>
-                </GlossyButton>
+                  Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
               </SignedIn>
 
-              <Button
-                variant="glass"
-                size="lg"
-                className="h-16 px-12 text-xl font-semibold text-indigo-50 bg-white/15 border border-white/30 hover:border-white/60 hover:bg-white/25 rounded-full shadow-[0_12px_40px_-15px_rgba(255,255,255,0.6)]"
-                asChild
+              <Link
+                href="/dashboard/chat"
+                className="inline-flex h-16 items-center justify-center rounded-xl border border-black/15 bg-white/80 px-12 text-lg sm:text-xl font-semibold text-gray-900 shadow-md shadow-black/10 backdrop-blur transition hover:-translate-y-0.5 hover:border-black/25"
               >
-                <Link href="/dashboard/chat">
-                  Try Placement Mode
-                </Link>
-              </Button>
+                Try Placement Mode
+              </Link>
             </motion.div>
 
 
@@ -223,33 +212,6 @@ export default function LandingPage() {
                 <span>50+ countries</span>
               </div>
             </motion.div>
-          </motion.div>
-
-          {/* Hero Dashboard Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-            className="mt-20 max-w-5xl mx-auto"
-          >
-            <div className="glass-card rounded-3xl p-2 shadow-2xl shadow-indigo-200/40 bg-[#07072E] border-0 overflow-hidden">
-               <div className="h-150 w-full relative">
-                  <SplineScene />
-                  <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end pointer-events-none">
-                    <div className="space-y-1">
-                      <p className="text-white/40 text-xs font-mono tracking-widest uppercase">System Status</p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-white text-sm font-medium">Core Intelligence Online</span>
-                      </div>
-                    </div>
-                    <div className="text-right space-y-1">
-                      <p className="text-white/40 text-xs font-mono tracking-widest uppercase">Visualization</p>
-                      <p className="text-white text-sm font-medium">Career Trajectory 3.0</p>
-                    </div>
-                  </div>
-               </div>
-            </div>
           </motion.div>
 
         </div>
@@ -580,15 +542,12 @@ export default function LandingPage() {
               Join thousands of professionals using AI to make smarter career decisions.
               Start your free analysis today.
             </p>
-            <GlossyButton
-              variant="liquid"
-              className="h-14 px-10 text-lg"
-              asChild
+            <Link
+              href="/dashboard/chat"
+              className="inline-flex h-14 items-center justify-center rounded-xl bg-black px-10 text-lg font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40"
             >
-              <Link href="/dashboard/chat">
-                Start Free Analysis <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </GlossyButton>
+              Start Free Analysis <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
           </motion.div>
         </motion.div>
       </section>
