@@ -181,7 +181,7 @@ export default function DashboardPage() {
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 leading-none">
             Welcome back, <span className="gradient-text italic">{user.name?.split(' ')[0] || 'Developer'}</span>
           </h1>
-          <p className="text-gray-500 mt-3 text-lg font-medium">Your execution engine is optimized. Focus on this week's sprint.</p>
+          <p className="text-gray-500 mt-3 text-lg font-medium">Your execution engine is optimized. Focus on this week&apos;s sprint.</p>
         </div>
         <div className="flex gap-3">
           <div className="glass-card px-5 py-3 rounded-2xl flex items-center gap-4 border border-indigo-50 shadow-sm">

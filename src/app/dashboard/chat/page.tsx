@@ -326,7 +326,7 @@ export default function ChatPage() {
                     <div className="space-y-2">
                       {placementAnalysis.hr_question_generator.map((q, i) => (
                         <div key={i} className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-medium text-gray-700 italic">
-                          "{q}"
+                          {"\u201C"}{q}{"\u201D"}
                         </div>
                       ))}
                     </div>
