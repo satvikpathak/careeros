@@ -24,9 +24,13 @@ import AppNavbar from "@/components/navigation/AppNavbar";
 
 
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+  },
 };
 
 const revealChar: Variants = {
@@ -35,16 +39,28 @@ const revealChar: Variants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { delay: i * 0.03, duration: 0.6, ease: [0.22, 0.8, 0.2, 1] },
+    transition: { delay: i * 0.03, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: { staggerChildren: 0.1, delayChildren: 0.2 },
   },
+};
+
+const buttonVariants: Variants = {
+  initial: { scale: 1 },
+  hover: { scale: 1.03, y: -2, transition: { type: "spring", stiffness: 400, damping: 10 } },
+  tap: { scale: 0.97 },
+};
+
+const cardVariants: Variants = {
+  initial: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hover: { y: -8, boxShadow: "0 20px 40px -12px rgba(0,0,0,0.1)", transition: { type: "spring", stiffness: 400, damping: 17 } },
 };
 
 export default function LandingPage() {
@@ -94,9 +110,32 @@ export default function LandingPage() {
       <section className="relative pt-32 pb-20 px-6">
         {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-40 w-80 h-80 bg-purple-100/30 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 w-60 h-60 bg-blue-100/20 rounded-full blur-3xl" />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.1, 1],
+              x: [0, 20, 0],
+              y: [0, -20, 0]
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              x: [0, -30, 0],
+              y: [0, 30, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-20 -left-40 w-80 h-80 bg-purple-100/30 rounded-full blur-3xl" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.15, 1],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="absolute top-1/3 left-1/2 w-60 h-60 bg-blue-100/20 rounded-full blur-3xl" 
+          />
         </div>
 
         <div className="max-w-7xl mx-auto relative">
@@ -125,7 +164,7 @@ export default function LandingPage() {
                 </motion.span>
               ))}
               <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-300 via-purple-300 to-blue-300">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-gray-400 to-gray-900">
                 {"Intelligently".split("").map((char, i) => (
                   <motion.span
                     key={i}
@@ -167,26 +206,43 @@ export default function LandingPage() {
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <SignedOut>
                 <SignUpButton mode="modal">
-                  <span className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40">
+                  <motion.button 
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:shadow-black/40"
+                  >
                     Get Your Readiness Score <Target className="w-5 h-5 ml-2" />
-                  </span>
+                  </motion.button>
                 </SignUpButton>
               </SignedOut>
               <SignedIn>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40"
+                <motion.div
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
                 >
-                  Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex h-16 items-center justify-center rounded-xl bg-black px-12 text-lg sm:text-xl font-semibold text-white shadow-lg shadow-black/30 transition hover:shadow-black/40"
+                  >
+                    Go to Dashboard <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                </motion.div>
               </SignedIn>
 
-              <Link
-                href="/dashboard/chat"
-                className="inline-flex h-16 items-center justify-center rounded-xl border border-black/15 bg-white/80 px-12 text-lg sm:text-xl font-semibold text-gray-900 shadow-md shadow-black/10 backdrop-blur transition hover:-translate-y-0.5 hover:border-black/25"
+              <motion.div
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
               >
-                Try Placement Mode
-              </Link>
+                <Link
+                  href="/dashboard/chat"
+                  className="inline-flex h-16 items-center justify-center rounded-xl border border-black/15 bg-white/80 px-12 text-lg sm:text-xl font-semibold text-gray-900 shadow-md shadow-black/10 backdrop-blur transition hover:border-black/25"
+                >
+                  Try Placement Mode
+                </Link>
+              </motion.div>
             </motion.div>
 
 
@@ -320,11 +376,12 @@ export default function LandingPage() {
             ].map((feature) => (
               <motion.div
                 key={feature.title}
-                variants={fadeUp}
-                className="glass-card rounded-2xl p-6 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300 group cursor-default"
+                variants={cardVariants}
+                whileHover="hover"
+                className="glass-card rounded-2xl p-6 transition-all duration-300 group cursor-default"
               >
                 <div
-                  className={`w-11 h-11 rounded-xl ${feature.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-11 h-11 rounded-xl ${feature.bg} flex items-center justify-center mb-4 transition-transform duration-300`}
                 >
                   <feature.icon className="w-5 h-5" style={{ color: feature.color }} />
                 </div>
@@ -397,13 +454,20 @@ export default function LandingPage() {
               <motion.div
                 key={item.step}
                 variants={fadeUp}
-                className="text-center"
+                whileHover={{ y: -5 }}
+                className="text-center group"
               >
                 <div className="relative w-16 h-16 mx-auto mb-6">
-                  <div className="absolute inset-0 bg-indigo-100 rounded-2xl rotate-6" />
-                  <div className="relative w-full h-full bg-white rounded-2xl border border-indigo-100 flex items-center justify-center shadow-sm">
-                    <item.icon className="w-7 h-7 text-indigo-500" />
-                  </div>
+                  <motion.div 
+                    whileHover={{ rotate: 12, scale: 1.1 }}
+                    className="absolute inset-0 bg-indigo-100 rounded-2xl rotate-6 transition-transform" 
+                  />
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    className="relative w-full h-full bg-white rounded-2xl border border-indigo-100 flex items-center justify-center shadow-sm"
+                  >
+                    <item.icon className="w-7 h-7 text-indigo-500 group-hover:scale-110 transition-transform" />
+                  </motion.div>
                 </div>
                 <div className="text-xs font-mono text-indigo-400 mb-2">
                   STEP {item.step}
@@ -442,7 +506,7 @@ export default function LandingPage() {
             className="grid md:grid-cols-3 gap-6"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
           >
             {[
@@ -464,7 +528,8 @@ export default function LandingPage() {
             ].map((testimonial) => (
               <motion.div
                 key={testimonial.name}
-                variants={fadeUp}
+                variants={cardVariants}
+                whileHover="hover"
                 className="glass-card rounded-2xl p-6"
               >
                 <div className="flex items-center gap-1 mb-4">
@@ -476,9 +541,12 @@ export default function LandingPage() {
                   &ldquo;{testimonial.text}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium">
+                  <motion.div 
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium"
+                  >
                     {testimonial.name.split(" ").map(n => n[0]).join("")}
-                  </div>
+                  </motion.div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       {testimonial.name}
@@ -530,11 +598,18 @@ export default function LandingPage() {
         >
           <motion.div
             variants={fadeUp}
-            className="glass-card rounded-3xl p-12 gradient-border"
+            className="glass-card rounded-3xl p-12 gradient-border relative overflow-hidden"
           >
-            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, 0]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="w-14 h-14 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/20"
+            >
               <Sparkles className="w-7 h-7 text-white" />
-            </div>
+            </motion.div>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Ready to accelerate your career?
             </h2>
@@ -542,12 +617,19 @@ export default function LandingPage() {
               Join thousands of professionals using AI to make smarter career decisions.
               Start your free analysis today.
             </p>
-            <Link
-              href="/dashboard/chat"
-              className="inline-flex h-14 items-center justify-center rounded-xl bg-black px-10 text-lg font-semibold text-white shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-black/40"
+            <motion.div
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="inline-block"
             >
-              Start Free Analysis <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
+              <Link
+                href="/dashboard/chat"
+                className="inline-flex h-14 items-center justify-center rounded-xl bg-black px-10 text-lg font-semibold text-white shadow-lg shadow-black/30 transition hover:shadow-black/40"
+              >
+                Start Free Analysis <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
