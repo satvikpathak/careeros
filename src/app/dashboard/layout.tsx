@@ -1,17 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
-import AppNavbar from "@/components/navigation/AppNavbar";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/chat", label: "AI Interview" },
-  { href: "/dashboard/resume", label: "Intelligence Audit" },
-  { href: "/dashboard/jobs", label: "Job Radar" },
-  { href: "/dashboard/resources", label: "Resources" },
-  { href: "/dashboard/roadmap", label: "Roadmap" },
-];
+import DashboardSidebar from "@/components/navigation/DashboardSidebar";
+import DashboardHeader from "@/components/navigation/DashboardHeader";
 
 export default function DashboardLayout({
   children,
@@ -19,25 +9,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen gradient-bg">
-      <AppNavbar
-        links={navItems}
-        rightSlot={
-          <Link
-            href="/"
-            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/60 border border-white/70 text-sm font-semibold text-gray-800 hover:-translate-y-0.5 transition"
-          >
-            <Sparkles className="w-4 h-4" />
-            Explore Landing
-          </Link>
-        }
-      />
+    <div className="min-h-screen bg-[#FAFBFF]">
+      {/* Sidebar */}
+      <DashboardSidebar />
 
-      <main className="pt-28 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      {/* Main content area — shifted right by sidebar width */}
+      <div className="lg:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
+        {/* Top Header */}
+        <DashboardHeader />
+
+        {/* Page content */}
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

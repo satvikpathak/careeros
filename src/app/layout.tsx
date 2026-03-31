@@ -27,7 +27,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_c2hpbmluZy1jcmFiLTEwLmNsZXJrLmFjY291bnRzLmRldiQ";
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  if (!clerkKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY. Add your Clerk publishable key to the environment (.env.local) to enable auth."
+    );
+  }
 
   return (
     <ClerkProvider publishableKey={clerkKey}>
@@ -42,7 +48,7 @@ export default function RootLayout({
           </QueryProvider>
 
           {/* Global SVG Filters for Liquid Glass Effect */}
-          <svg style={{ display: 'none' }}>
+          <svg className="hidden">
             <defs>
               <filter id="container-glass" x="-20%" y="-20%" width="140%" height="140%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
