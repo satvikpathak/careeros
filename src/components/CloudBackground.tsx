@@ -172,7 +172,7 @@ const CloudBackground: React.FC = () => {
   return (
     <div 
       ref={containerRef} 
-      className="fixed inset-0 w-screen h-screen -z-10 bg-[#326696]"
+  className="fixed inset-0 w-screen h-screen -z-10 bg-[#326696]"
       style={{ pointerEvents: 'none' }}
     />
   );

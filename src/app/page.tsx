@@ -79,7 +79,9 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="text-sm font-semibold text-gray-800 hover:text-black">Log in</button>
+                <button className="px-1 text-sm font-semibold text-gray-800 transition-colors hover:text-black">
+                  Log in
+                </button>
               </SignInButton>
             </SignedOut>
             <SignedOut>
@@ -90,7 +92,7 @@ export default function LandingPage() {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/dashboard" className="text-sm font-semibold text-gray-800 hover:text-black transition-colors mr-2">
+              <Link href="/dashboard" className="mr-2 text-sm font-semibold text-gray-800 transition-colors hover:text-black">
                 Dashboard
               </Link>
               <UserButton
@@ -117,7 +119,7 @@ export default function LandingPage() {
               y: [0, -20, 0]
             }}
             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl" 
+            className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-black/10 blur-3xl" 
           />
           <motion.div 
             animate={{ 
@@ -126,7 +128,7 @@ export default function LandingPage() {
               y: [0, 30, 0]
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-20 -left-40 w-80 h-80 bg-purple-100/30 rounded-full blur-3xl" 
+            className="absolute -bottom-20 -left-40 w-80 h-80 rounded-full bg-black/10 blur-3xl" 
           />
           <motion.div 
             animate={{ 
@@ -134,7 +136,7 @@ export default function LandingPage() {
               opacity: [0.2, 0.4, 0.2]
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/3 left-1/2 w-60 h-60 bg-blue-100/20 rounded-full blur-3xl" 
+            className="absolute top-1/3 left-1/2 w-60 h-60 rounded-full bg-black/10 blur-3xl" 
           />
         </div>
 
@@ -164,7 +166,7 @@ export default function LandingPage() {
                 </motion.span>
               ))}
               <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-gray-400 to-gray-900">
+              <span className="bg-linear-to-r from-[#b7beff] via-[#ad9df6] to-[#8fb7ff] bg-clip-text text-transparent">
                 {"Intelligently".split("").map((char, i) => (
                   <motion.span
                     key={i}
@@ -238,7 +240,7 @@ export default function LandingPage() {
               >
                 <Link
                   href="/dashboard/chat"
-                  className="inline-flex h-16 items-center justify-center rounded-xl border border-black/15 bg-white/80 px-12 text-lg sm:text-xl font-semibold text-gray-900 shadow-md shadow-black/10 backdrop-blur transition hover:border-black/25"
+                  className="inline-flex h-16 items-center justify-center rounded-xl border border-black/15 bg-white px-12 text-lg sm:text-xl font-semibold text-gray-900 shadow-md shadow-black/10 transition hover:border-black/25"
                 >
                   Try Placement Mode
                 </Link>
@@ -258,7 +260,7 @@ export default function LandingPage() {
               <div className="w-px h-4 bg-gray-200" />
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <Star key={i} className="w-3.5 h-3.5 fill-yellow-500 text-gray-500" />
                 ))}
                 <span className="ml-1">4.9/5</span>
               </div>
@@ -299,7 +301,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
           >
-            <motion.p variants={fadeUp} className="text-sm font-medium text-indigo-500 mb-3">
+            <motion.p variants={fadeUp} className="mb-3 text-sm font-medium text-gray-600">
               FEATURES
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -330,48 +332,48 @@ export default function LandingPage() {
                 title: "Intelligence Audit",
                 description:
                   "Quantified readiness score based on deep AI analysis of your resume and GitHub profile complexity.",
-                color: "#6366f1",
-                bg: "bg-indigo-50",
+                color: "#111111",
+                bg: "bg-zinc-100",
               },
               {
                 icon: Zap,
                 title: "Weekly AI Sprints",
                 description:
                   "5 actionable tasks every week designed to close your specific skill gaps and build your portfolio.",
-                color: "#a855f7",
-                bg: "bg-purple-50",
+                color: "#1f1f1f",
+                bg: "bg-zinc-100",
               },
               {
                 icon: Rocket,
                 title: "Project Builder",
                 description:
                   "Portfolio-grade project blueprints with architecture diagrams, tech stacks, and resume bullet points.",
-                color: "#10b981",
-                bg: "bg-emerald-50",
+                color: "#2d2d2d",
+                bg: "bg-zinc-100",
               },
               {
                 icon: TrendingUp,
                 title: "Market Radar",
                 description:
                   "Real-time demand analysis for tech stacks in your target role, helping you stay ahead of hiring trends.",
-                color: "#f59e0b",
-                bg: "bg-amber-50",
+                color: "#2a2a2a",
+                bg: "bg-zinc-100",
               },
               {
                 icon: Bot,
                 title: "Placement Mode",
                 description:
                   "Specialized interview preparation for Indian tech companies with DSA topic heatmaps and HR prep.",
-                color: "#f43f5e",
-                bg: "bg-rose-50",
+                color: "#0f0f0f",
+                bg: "bg-zinc-100",
               },
               {
                 icon: Briefcase,
                 title: "Job Matching 2.0",
                 description:
                   "Aggregates matching jobs and ranks them by semantic similarity to your latest career audit results.",
-                color: "#06b6d4",
-                bg: "bg-cyan-50",
+                color: "#333333",
+                bg: "bg-zinc-100",
               },
             ].map((feature) => (
               <motion.div
@@ -398,7 +400,7 @@ export default function LandingPage() {
       </section>
 
       {/* ========== How It Works ========== */}
-  <section id="how-it-works" className="py-24 px-6 bg-linear-to-b from-transparent via-indigo-50/30 to-transparent">
+  <section id="how-it-works" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="text-center mb-16"
@@ -407,7 +409,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.p variants={fadeUp} className="text-sm font-medium text-indigo-500 mb-3">
+            <motion.p variants={fadeUp} className="mb-3 text-sm font-medium text-gray-600">
               HOW IT WORKS
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -460,16 +462,16 @@ export default function LandingPage() {
                 <div className="relative w-16 h-16 mx-auto mb-6">
                   <motion.div 
                     whileHover={{ rotate: 12, scale: 1.1 }}
-                    className="absolute inset-0 bg-indigo-100 rounded-2xl rotate-6 transition-transform" 
+                    className="absolute inset-0 rounded-2xl bg-zinc-200 rotate-6 transition-transform" 
                   />
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
-                    className="relative w-full h-full bg-white rounded-2xl border border-indigo-100 flex items-center justify-center shadow-sm"
+                    className="relative w-full h-full rounded-2xl border border-zinc-200 bg-white flex items-center justify-center shadow-sm"
                   >
-                    <item.icon className="w-7 h-7 text-indigo-500 group-hover:scale-110 transition-transform" />
+                    <item.icon className="w-7 h-7 text-black group-hover:scale-110 transition-transform" />
                   </motion.div>
                 </div>
-                <div className="text-xs font-mono text-indigo-400 mb-2">
+                <div className="mb-2 text-xs font-mono text-gray-500">
                   STEP {item.step}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -494,7 +496,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.p variants={fadeUp} className="text-sm font-medium text-indigo-500 mb-3">
+            <motion.p variants={fadeUp} className="mb-3 text-sm font-medium text-gray-600">
               TESTIMONIALS
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold text-gray-900">
@@ -534,7 +536,7 @@ export default function LandingPage() {
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-4 h-4 fill-gray-500 text-gray-500" />
                   ))}
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed mb-5">
@@ -543,7 +545,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <motion.div 
                     whileHover={{ scale: 1.1, rotate: 5 }}
-                    className="w-9 h-9 rounded-full bg-linear-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-xs font-medium text-white"
                   >
                     {testimonial.name.split(" ").map(n => n[0]).join("")}
                   </motion.div>
@@ -561,7 +563,7 @@ export default function LandingPage() {
       </section>
 
       {/* ========== Stats Section ========== */}
-  <section className="py-20 px-6 bg-linear-to-b from-transparent via-indigo-50/30 to-transparent">
+  <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
@@ -598,7 +600,7 @@ export default function LandingPage() {
         >
           <motion.div
             variants={fadeUp}
-            className="glass-card rounded-3xl p-12 gradient-border relative overflow-hidden"
+            className="glass-card relative overflow-hidden rounded-3xl border border-black/10 p-12"
           >
             <motion.div 
               animate={{ 
@@ -606,7 +608,7 @@ export default function LandingPage() {
                 rotate: [0, 10, 0]
               }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-14 h-14 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/20"
+              className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-black shadow-lg shadow-black/20"
             >
               <Sparkles className="w-7 h-7 text-white" />
             </motion.div>
@@ -639,11 +641,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="text-sm font-semibold text-gray-900">
-                Career<span className="gradient-text">OS</span>
+                CareerOS
               </span>
             </div>
 
