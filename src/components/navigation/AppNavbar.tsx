@@ -22,6 +22,7 @@ interface AppNavbarProps {
 export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sign Up", rightSlot }: AppNavbarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isHomePage = pathname === "/";
 
   const activeHref = useMemo(() => {
     const nonHash = links.filter((l) => !l.href.startsWith("#"));
@@ -42,7 +43,12 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
     >
       <Link
         href={ctaHref}
-        className="inline-flex h-10 items-center justify-center rounded-md bg-black px-4 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
+        className={cn(
+          "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold transition",
+          isHomePage
+            ? "border border-white/50 bg-white/30 text-gray-900 shadow-md backdrop-blur-md hover:bg-white/45"
+            : "bg-black text-white shadow-md hover:shadow-lg"
+        )}
       >
         {ctaLabel}
       </Link>
@@ -56,16 +62,22 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-auto flex w-full max-w-6xl items-center justify-between rounded-xl border border-white/30 bg-white/40 px-4 sm:px-6 py-3 shadow-lg shadow-indigo-200/30 backdrop-blur-md transition"
+          className={cn(
+            "pointer-events-auto flex w-full max-w-6xl items-center justify-between rounded-xl px-4 py-3 backdrop-blur-md transition sm:px-6",
+            isHomePage
+              ? "border border-white/30 bg-white/40 shadow-lg shadow-indigo-200/30"
+              : "border border-black/10 bg-white/80 shadow-md"
+          )}
         >
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-10 w-10 overflow-hidden rounded-full border border-white/50 shadow">
-                <img
-                  src="https://i.pinimg.com/474x/10/cd/a9/10cda9e715b2b6799908fefbacae4d6b.jpg"
-                  alt="Logo"
-                  className="h-full w-full object-cover"
-                />
+              <div className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold shadow-sm",
+                isHomePage
+                  ? "border border-white/50 bg-white/60 text-gray-900"
+                  : "border border-black/15 bg-black text-white"
+              )}>
+                CO
               </div>
               <span className="text-sm font-semibold text-gray-900">CareerOS</span>
             </Link>
@@ -96,7 +108,12 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
           </div>
 
           <button
-            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/70 border border-white/60 text-gray-700 shadow"
+            className={cn(
+              "md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-700",
+              isHomePage
+                ? "border border-white/50 bg-white/50 shadow"
+                : "border border-black/15 bg-white shadow-sm"
+            )}
             onClick={() => setOpen((o: boolean) => !o)}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -112,7 +129,12 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="md:hidden mt-2 w-full max-w-6xl rounded-xl border border-white/40 bg-white/70 p-4 shadow-lg backdrop-blur-md"
+              className={cn(
+                "md:hidden mt-2 w-full max-w-6xl rounded-xl p-4 backdrop-blur-md",
+                isHomePage
+                  ? "border border-white/40 bg-white/70 shadow-lg"
+                  : "border border-black/10 bg-white/95 shadow-md"
+              )}
             >
               <div className="flex flex-col gap-3 text-sm font-semibold text-gray-800">
                 {navLinks.map((link, i) => (
@@ -125,7 +147,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
                     <Link
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-2 py-2 hover:bg-white transition-colors"
+                      className="block rounded-lg px-2 py-2 transition-colors hover:bg-black/5"
                     >
                       {link.label}
                     </Link>

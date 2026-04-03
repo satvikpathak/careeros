@@ -1,28 +1,55 @@
 "use client";
 
-import DashboardSidebar from "@/components/navigation/DashboardSidebar";
-import DashboardHeader from "@/components/navigation/DashboardHeader";
+import { UserButton } from "@clerk/nextjs";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+import AppNavbar from "@/components/navigation/AppNavbar";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/dashboard/resume", label: "Resume" },
+    { href: "/dashboard/roadmap", label: "Roadmap" },
+    { href: "/dashboard/jobs", label: "Jobs" },
+    { href: "/dashboard/resources", label: "Resources" },
+    { href: "/dashboard/chat", label: "AI Interview" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#FAFBFF]">
-      {/* Sidebar */}
-      <DashboardSidebar />
+      <AppNavbar
+        links={navLinks}
+        rightSlot={(
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                userButtonAvatarBox: "w-9 h-9 border border-gray-200",
+              },
+            }}
+          />
+        )}
+      />
 
-      {/* Main content area — shifted right by sidebar width */}
-      <div className="lg:ml-[260px] min-h-screen flex flex-col transition-all duration-300">
-        {/* Top Header */}
-        <DashboardHeader />
-
-        {/* Page content */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
-          {children}
-        </main>
-      </div>
+  <main className="mx-auto flex-1 w-full max-w-7xl px-4 pb-8 pt-32 sm:px-6 lg:px-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.24, ease: "easeOut" }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </main>
     </div>
   );
 }
