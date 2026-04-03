@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import AppNavbar from "@/components/navigation/AppNavbar";
+import { useRoadmapStore } from "@/stores/roadmap-store";
 
 export default function DashboardLayout({
   children,
@@ -11,6 +14,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { userId } = useAuth();
+  const bindToUser = useRoadmapStore((s) => s.bindToUser);
+
+  useEffect(() => {
+    bindToUser(userId ?? null);
+  }, [userId, bindToUser]);
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },

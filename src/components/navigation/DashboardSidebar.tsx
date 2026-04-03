@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  LogOut,
   Zap,
   Menu,
   X,
@@ -64,7 +63,7 @@ export default function DashboardSidebar() {
     return pathname.startsWith(href);
   };
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <motion.div
       variants={sidebarVariants}
       initial="hidden"
@@ -233,7 +232,7 @@ export default function DashboardSidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        <SidebarContent />
+        {sidebarContent}
       </aside>
     </>
   );

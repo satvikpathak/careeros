@@ -36,6 +36,57 @@ const SUGGESTED_TOPICS = [
   "AWS Cloud",
 ];
 
+const INVALID_RESOURCE_HOSTS = new Set(["example.com", "www.example.com", "localhost", "127.0.0.1"]);
+
+function isValidResourceUrl(url?: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) return false;
+    if (INVALID_RESOURCE_HOSTS.has(parsed.hostname.toLowerCase())) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeResources(data: any) {
+  const youtube_playlists = Array.isArray(data?.youtube_playlists)
+    ? data.youtube_playlists.filter(
+        (item: any) => typeof item?.title === "string" && item.title.trim() && isValidResourceUrl(item?.link)
+      )
+    : [];
+
+  const courses = Array.isArray(data?.courses)
+    ? data.courses.filter(
+        (item: any) =>
+          typeof item?.name === "string" &&
+          item.name.trim() &&
+          isValidResourceUrl(item?.registrationLink)
+      )
+    : [];
+
+  const blogs = Array.isArray(data?.blogs)
+    ? data.blogs.filter(
+        (item: any) => typeof item?.title === "string" && item.title.trim() && isValidResourceUrl(item?.link)
+      )
+    : [];
+
+  const documentation = Array.isArray(data?.documentation)
+    ? data.documentation.filter(
+        (item: any) => typeof item?.title === "string" && item.title.trim() && isValidResourceUrl(item?.link)
+      )
+    : [];
+
+  return {
+    topic: data?.topic,
+    youtube_playlists,
+    courses,
+    blogs,
+    documentation,
+  };
+}
+
 export default function ResourcesPage() {
   return (
     <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-indigo-400 animate-spin" /></div>}>
@@ -68,7 +119,7 @@ function ResourcesContent() {
 
   const fetchSkillGaps = async () => {
     try {
-      const res = await fetch("/api/dashboard/data");
+  const res = await fetch("/api/dashboard/data", { cache: "no-store" });
       const json = await res.json();
       if (json.success && json.data?.audit?.atsKeywordAnalysis?.skill_gaps) {
         setSkillGaps(json.data.audit.atsKeywordAnalysis.skill_gaps);
@@ -92,7 +143,7 @@ function ResourcesContent() {
 
       const json = await res.json();
       if (json.success) {
-        setResources(json.data);
+        setResources(sanitizeResources(json.data));
       } else {
         setError(json.error || "Failed to fetch resources");
       }

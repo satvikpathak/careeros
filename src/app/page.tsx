@@ -2,6 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
+import { Syne } from "next/font/google";
 import {
   ArrowRight,
   Bot,
@@ -21,6 +22,8 @@ import {
 import CloudBackground from "@/components/CloudBackground";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import AppNavbar from "@/components/navigation/AppNavbar";
+
+const syne = Syne({ subsets: ["latin"], weight: ["800"] });
 
 
 
@@ -200,7 +203,7 @@ export default function LandingPage() {
               variants={fadeUp}
               className="text-xl sm:text-2xl text-black/70 max-w-2xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              The AI career execution engine. CareerOS conducts readiness audits, 
+              The AI career execution engine. Cresco conducts readiness audits, 
               generates weekly execution sprints, and builds your portfolio blueprints.
             </motion.p>
 
@@ -515,7 +518,7 @@ export default function LandingPage() {
               {
                 name: "Sarah Chen",
                 role: "Software Engineer at Google",
-                text: "CareerOS helped me identify skill gaps I didn't know I had. The AI interview felt like talking to a real career coach.",
+                text: "Cresco helped me identify skill gaps I didn't know I had. The AI interview felt like talking to a real career coach.",
               },
               {
                 name: "Marcus Johnson",
@@ -641,11 +644,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-black">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-900">
-                CareerOS
+              <span className={`${syne.className} text-3xl leading-none font-extrabold tracking-tight text-gray-900`}>
+                cresco
               </span>
             </div>
 
@@ -656,7 +656,7 @@ export default function LandingPage() {
             </div>
 
             <p className="text-xs text-gray-400">
-              © {new Date().getFullYear()} CareerOS. All rights reserved.
+              © {new Date().getFullYear()} Cresco. All rights reserved.
             </p>
           </div>
         </div>

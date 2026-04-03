@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CareerOS — AI-Powered Career Intelligence",
+  title: "Cresco — AI-Powered Career Intelligence",
   description:
     "AI-driven career analysis, resume parsing, job matching, and career simulations. Your intelligent career copilot.",
   keywords: ["career", "AI", "resume", "jobs", "career intelligence", "job matching"],

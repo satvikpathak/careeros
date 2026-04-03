@@ -329,7 +329,7 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/dashboard/data");
+  const res = await fetch("/api/dashboard/data", { cache: "no-store" });
       const json = await res.json();
       if (json.success) {
         setData(json.data);
