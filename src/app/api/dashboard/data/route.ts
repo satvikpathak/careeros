@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function noStoreJson(payload: unknown, status = 200) {
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+  });
+}
+
 export async function GET(req: NextRequest) {
   try {
     // Dynamic imports to prevent build-time failures when env vars are missing
@@ -9,9 +23,9 @@ export async function GET(req: NextRequest) {
     const clerkUser = await currentUser();
 
     if (!clerkId || !clerkUser) {
-      return NextResponse.json(
+      return noStoreJson(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        401
       );
     }
 
@@ -64,7 +78,7 @@ export async function GET(req: NextRequest) {
         atsKeywordAnalysis: latestAudit.atsKeywordAnalysis ?? (latestAudit as any).ats_keyword_analysis ?? {},
       } : null;
 
-      return NextResponse.json({
+      return noStoreJson({
         success: true,
         data: {
           user: {
@@ -94,7 +108,7 @@ export async function GET(req: NextRequest) {
       });
     } catch (dbError) {
       console.warn("DB operations failed, returning empty data:", dbError);
-      return NextResponse.json({
+      return noStoreJson({
         success: true,
         data: {
           user: {
@@ -114,12 +128,12 @@ export async function GET(req: NextRequest) {
     }
   } catch (error: unknown) {
     console.error("Dashboard data error:", error);
-    return NextResponse.json(
+    return noStoreJson(
       {
         success: false,
         error: error instanceof Error ? error.message : "Internal Server Error",
       },
-      { status: 500 }
+      500
     );
   }
 }

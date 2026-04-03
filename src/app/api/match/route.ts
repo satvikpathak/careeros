@@ -22,6 +22,28 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return denominator === 0 ? 0 : dotProduct / denominator;
 }
 
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1);
+}
+
+function lexicalSimilarity(aText: string, bText: string): number {
+  const aTokens = new Set(tokenize(aText));
+  const bTokens = new Set(tokenize(bText));
+
+  if (aTokens.size === 0 || bTokens.size === 0) return 0;
+
+  let intersection = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) intersection += 1;
+  }
+
+  return intersection / Math.max(aTokens.size, bTokens.size);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { resumeText, jobs } = await req.json();
@@ -33,34 +55,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate resume embedding
+    // Generate resume embedding (best effort)
     const resumeEmbedding = await generateEmbedding(resumeText);
+    const canUseEmbeddings = resumeEmbedding.length > 0;
 
-    if (resumeEmbedding.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Failed to generate resume embedding" },
-        { status: 500 }
-      );
-    }
-
-    // Generate embeddings for each job and compute similarity
+    // Compute similarity per job, with lexical fallback if embeddings fail
     const matchResults = await Promise.all(
       jobs.map(async (job: { id: string; title: string; description: string; company: string }) => {
-        try {
-          const jobText = `${job.title} at ${job.company}. ${job.description}`;
-          const jobEmbedding = await generateEmbedding(jobText);
-          const score = cosineSimilarity(resumeEmbedding, jobEmbedding);
+        const jobText = `${job.title} at ${job.company}. ${job.description}`;
 
-          return {
-            job_id: job.id,
-            match_score: Math.round(score * 10000) / 10000,
-          };
-        } catch {
-          return {
-            job_id: job.id,
-            match_score: 0,
-          };
+        if (canUseEmbeddings) {
+          try {
+            const jobEmbedding = await generateEmbedding(jobText);
+            if (jobEmbedding.length > 0) {
+              const score = cosineSimilarity(resumeEmbedding, jobEmbedding);
+              return {
+                job_id: job.id,
+                match_score: Math.round(score * 10000) / 10000,
+              };
+            }
+          } catch {
+            // fall through to lexical score
+          }
         }
+
+        const lexicalScore = lexicalSimilarity(resumeText, jobText);
+        return {
+          job_id: job.id,
+          match_score: Math.round(lexicalScore * 10000) / 10000,
+        };
       })
     );
 
@@ -70,6 +93,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: matchResults.slice(0, 20),
+      meta: {
+        method: canUseEmbeddings ? "embedding+lexical-fallback" : "lexical-fallback",
+      },
     });
   } catch (error: unknown) {
     console.error("Matching error:", error);

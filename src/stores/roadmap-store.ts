@@ -50,6 +50,8 @@ export interface PhaseResources {
 // ---- Store ----
 
 interface RoadmapState {
+  activeClerkId: string | null;
+
   // Core roadmap
   roadmap: Roadmap | null;
   isGenerating: boolean;
@@ -88,12 +90,14 @@ interface RoadmapState {
   setQuizResult: (phaseIndex: number, result: QuizResult) => void;
   setLoadingQuiz: (phaseIndex: number, val: boolean) => void;
   setAuditContext: (skillGaps: string[], currentSkills: string[], targetRole: string) => void;
+  bindToUser: (clerkId: string | null) => void;
   getPhaseProgress: (phaseIndex: number) => number;
   getOverallProgress: () => number;
   reset: () => void;
 }
 
 const initialState = {
+  activeClerkId: null as string | null,
   roadmap: null,
   isGenerating: false,
   sourceType: null as "auto" | "manual" | null,
@@ -178,6 +182,17 @@ export const useRoadmapStore = create<RoadmapState>()(
       setAuditContext: (skillGaps, currentSkills, targetRole) =>
         set({ skillGaps, currentSkills, targetRole }),
 
+      bindToUser: (clerkId) =>
+        set((state) => {
+          if (!clerkId) return state;
+          if (state.activeClerkId === clerkId) return state;
+
+          return {
+            ...initialState,
+            activeClerkId: clerkId,
+          };
+        }),
+
       getPhaseProgress: (phaseIndex) => {
         const state = get();
         const step = state.roadmap?.steps[phaseIndex];
@@ -204,6 +219,7 @@ export const useRoadmapStore = create<RoadmapState>()(
       name: "careeros-roadmap",
       // Only persist these fields (not loading states)
       partialize: (state) => ({
+        activeClerkId: state.activeClerkId,
         roadmap: state.roadmap,
         sourceType: state.sourceType,
         expandedPhases: state.expandedPhases,
@@ -233,10 +249,11 @@ function syncProgressToDb() {
   syncTimer = setTimeout(async () => {
     try {
       const state = useRoadmapStore.getState();
-      if (!state.roadmap) return;
+      if (!state.roadmap || !state.activeClerkId) return;
       await fetch("/api/roadmap/progress", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({
           completedPhases: state.completedPhases,
           topicChecklist: state.topicChecklist,

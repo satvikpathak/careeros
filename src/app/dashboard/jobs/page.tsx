@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -55,33 +55,11 @@ export default function JobsPage() {
   const { parsedResume } = useProfileStore();
   const [matchScores, setMatchScores] = useState<Record<string, number>>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [apiStatusMessage, setApiStatusMessage] = useState<string | null>(null);
 
-  const searchJobs = async () => {
-    if (!searchQuery.trim()) return;
-    setSearching(true);
-
-    try {
-      const params = new URLSearchParams({
-        query: searchQuery,
-        location: searchLocation,
-        source: selectedSource,
-      });
-
-      const response = await fetch(`/api/jobs?${params}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setJobs(data.data);
-      }
-    } catch {
-      console.error("Job search failed");
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const matchJobs = async () => {
-    if (!parsedResume || jobs.length === 0) return;
+  const matchJobs = useCallback(async (jobsToMatch?: NormalizedJob[]) => {
+    const candidateJobs = jobsToMatch ?? jobs;
+    if (!parsedResume || candidateJobs.length === 0) return;
     setMatching(true);
 
     try {
@@ -92,7 +70,7 @@ export default function JobsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           resumeText,
-          jobs: jobs.map((j) => ({
+          jobs: candidateJobs.map((j) => ({
             id: j.id,
             title: j.title,
             description: j.description,
@@ -113,6 +91,43 @@ export default function JobsPage() {
       console.error("Matching failed");
     } finally {
       setMatching(false);
+    }
+  }, [jobs, parsedResume, setMatching]);
+
+  const searchJobs = async () => {
+    if (!searchQuery.trim()) return;
+    setSearching(true);
+    setApiStatusMessage(null);
+    setMatchScores({});
+
+    try {
+      const params = new URLSearchParams({
+        query: searchQuery,
+        location: searchLocation,
+        source: selectedSource,
+      });
+
+      const response = await fetch(`/api/jobs?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        const fetchedJobs: NormalizedJob[] = data.data || [];
+        setJobs(fetchedJobs);
+
+        if (data.meta?.usingFallback) {
+          setApiStatusMessage(data.meta?.fallbackReason || "External jobs API unavailable; showing fallback jobs.");
+        }
+
+        // Auto-match top jobs immediately when resume exists
+        if (parsedResume && fetchedJobs.length > 0) {
+          await matchJobs(fetchedJobs);
+        }
+      }
+    } catch {
+      console.error("Job search failed");
+      setApiStatusMessage("Job API request failed. Please try again.");
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -135,6 +150,16 @@ export default function JobsPage() {
           Search and match jobs from LinkedIn, Indeed, and Naukri
         </p>
       </motion.div>
+
+      {apiStatusMessage && (
+        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border border-amber-200 bg-amber-50">
+            <CardContent className="p-3 text-xs font-medium text-amber-800">
+              {apiStatusMessage}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Search Bar */}
       <motion.div initial="hidden" animate="visible" variants={fadeIn}>
@@ -220,7 +245,9 @@ export default function JobsPage() {
       {parsedResume && jobs.length > 0 && (
         <motion.div initial="hidden" animate="visible" variants={fadeIn}>
           <Button
-            onClick={matchJobs}
+            onClick={() => {
+              void matchJobs();
+            }}
             disabled={isMatching}
             variant="outline"
             className="glass-card"
@@ -266,7 +293,7 @@ export default function JobsPage() {
                   <CardContent className="p-5">
                     <div className="flex gap-4">
                       {/* Company icon */}
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 rounded-xl bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <Building2 className="w-5 h-5 text-gray-400" />
                       </div>
 

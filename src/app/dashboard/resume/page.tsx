@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button";
 import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import type { ParsedResume } from "@/lib/types";
-import { ROLE_CONFIGS, calculateATSScore } from "@/lib/constants";
 import Link from "next/link";
 
 const fadeIn = {
@@ -47,7 +46,9 @@ export default function ResumePage() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [selectedRole, setSelectedRole] = useState("Software Engineer");
+  const [selectedRole, setSelectedRole] = useState("");
+  const [detectedRole, setDetectedRole] = useState<string>("General Professional");
+  const [detectedDomain, setDetectedDomain] = useState<string>("General");
   const [auditSaved, setAuditSaved] = useState(false);
   const [roadmapStatus, setRoadmapStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
   const [previousAudit, setPreviousAudit] = useState<any>(null);
@@ -55,11 +56,30 @@ export default function ResumePage() {
 
   const { setRoadmap, setAuditContext, setGenerating: setRoadmapGenerating } = useRoadmapStore();
 
+  const ROLE_SUGGESTIONS = [
+    "Civil Engineer",
+    "Mechanical Engineer",
+    "Architect",
+    "Graphic Designer",
+    "Teacher",
+    "Lawyer",
+    "Doctor",
+    "Nurse",
+    "Accountant",
+    "Business Analyst",
+    "HR Manager",
+    "Marketing Manager",
+    "Sales Executive",
+    "Content Writer",
+    "Software Engineer",
+    "Data Analyst",
+  ];
+
   // Load previous audit on mount so user sees their last audit
   useEffect(() => {
     const loadPreviousAudit = async () => {
       try {
-        const res = await fetch("/api/dashboard/data");
+  const res = await fetch("/api/dashboard/data", { cache: "no-store" });
         const json = await res.json();
         if (json.success && json.data?.audit) {
           setPreviousAudit(json.data.audit);
@@ -67,7 +87,14 @@ export default function ResumePage() {
           const audit = json.data.audit;
           const skills = audit.skillMap ? Object.keys(audit.skillMap) : [];
           if (skills.length > 0 && !parsedResume) {
+            const inferredRole = audit.atsKeywordAnalysis?.inferred_current_role || "General Professional";
+            const inferredDomain = audit.atsKeywordAnalysis?.inferred_profession_domain || "General";
+            const targetRoleUsed = audit.atsKeywordAnalysis?.target_role_used || "";
+
             setParsedResume({
+              inferred_current_role: inferredRole,
+              inferred_profession_domain: inferredDomain,
+              target_role_used: targetRoleUsed || inferredRole,
               skills,
               experience_years: "N/A",
               education: [],
@@ -76,6 +103,9 @@ export default function ResumePage() {
               missing_keywords: audit.atsKeywordAnalysis?.skill_gaps || [],
               summary: audit.atsKeywordAnalysis?.depth_vs_breadth || "",
             });
+            setDetectedRole(inferredRole);
+            setDetectedDomain(inferredDomain);
+            if (targetRoleUsed) setSelectedRole(targetRoleUsed);
             setAtsScore(audit.marketMatchScore || 0);
             setAuditSaved(true);
           }
@@ -151,7 +181,7 @@ export default function ResumePage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("targetRole", selectedRole);
+  formData.append("targetRole", selectedRole.trim());
 
       const response = await fetch("/api/resume", {
         method: "POST",
@@ -164,27 +194,37 @@ export default function ResumePage() {
         const parsed: ParsedResume = data.data.parsed_data;
         setParsedResume(parsed);
 
+        const inferredRole = parsed.inferred_current_role || data.data.audit?.inferred_current_role || "General Professional";
+        const inferredDomain = parsed.inferred_profession_domain || data.data.audit?.inferred_profession_domain || "General";
+        const resolvedTargetRole = selectedRole.trim() || parsed.target_role_used || data.data.audit?.target_role_used || inferredRole;
+
+        setDetectedRole(inferredRole);
+        setDetectedDomain(inferredDomain);
+        if (!selectedRole.trim()) {
+          setSelectedRole(resolvedTargetRole);
+        }
+
         // Track whether audit was saved to DB
         if (data.data.dbSaved) {
           setAuditSaved(true);
           // Auto-generate personalized roadmap from audit data
-          generateRoadmapFromAudit(data.data.audit, parsed, selectedRole);
+          generateRoadmapFromAudit(data.data.audit, parsed, resolvedTargetRole);
         } else if (data.data.dbSaveError) {
           console.warn("Audit DB save issue:", data.data.dbSaveError);
           // Still generate roadmap even if DB save failed
-          generateRoadmapFromAudit(data.data.audit, parsed, selectedRole);
+          generateRoadmapFromAudit(data.data.audit, parsed, resolvedTargetRole);
         }
 
-        // Calculate ATS score
-        const roleConfig = ROLE_CONFIGS[selectedRole];
-        if (roleConfig) {
-          const ats = calculateATSScore(
-            parsed.skills || [],
-            roleConfig.top_skills,
-            parseInt(parsed.experience_years || "0")
-          );
-          setAtsScore(ats.score);
-        }
+        // Dynamic role-fit score from universal audit output
+        const marketMatch = Number(data.data.audit?.market_match_score);
+        const readiness = Number(data.data.audit?.readiness_score);
+        const fallbackScore = Number(parsed.strength_score || 0);
+        const dynamicScore = Number.isFinite(marketMatch)
+          ? marketMatch
+          : Number.isFinite(readiness)
+          ? readiness
+          : fallbackScore;
+        setAtsScore(Math.max(0, Math.min(100, Math.round(dynamicScore))));
       } else {
         setError(data.error || "Failed to parse resume");
       }
@@ -381,34 +421,24 @@ export default function ResumePage() {
               {/* Target Role Selector */}
               <div className="mt-6">
                 <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Target Role for ATS Scoring
+                  Target Role (Optional)
                 </label>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {Object.keys(ROLE_CONFIGS).slice(0, 6).map((role) => (
-                    <button
-                      key={role}
-                      onClick={() => {
-                        setSelectedRole(role);
-                        if (parsedResume) {
-                          const config = ROLE_CONFIGS[role];
-                          const ats = calculateATSScore(
-                            parsedResume.skills,
-                            config.top_skills,
-                            parseInt(parsedResume.experience_years || "0")
-                          );
-                          setAtsScore(ats.score);
-                        }
-                      }}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                        selectedRole === role
-                          ? "bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200"
-                          : "bg-gray-50 text-gray-500 hover:bg-gray-100"
-                      }`}
-                    >
-                      {role}
-                    </button>
+                <input
+                  type="text"
+                  list="target-role-suggestions"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  placeholder="Leave blank to auto-detect (e.g., Civil Engineer, Lawyer, Product Designer)"
+                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+                />
+                <datalist id="target-role-suggestions">
+                  {ROLE_SUGGESTIONS.map((role) => (
+                    <option key={role} value={role} />
                   ))}
-                </div>
+                </datalist>
+                <p className="mt-2 text-xs text-gray-500">
+                  Detected from resume: <span className="font-semibold text-gray-700">{detectedRole}</span> ({detectedDomain})
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -462,7 +492,7 @@ export default function ResumePage() {
                       {getScoreLabel(atsScore)}
                     </Badge>
                     <p className="text-xs text-gray-400 mt-2">
-                      For: {selectedRole}
+                      For: {selectedRole.trim() || parsedResume.target_role_used || detectedRole}
                     </p>
                   </CardContent>
                 </Card>

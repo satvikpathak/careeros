@@ -109,6 +109,9 @@ export interface Profile {
 }
 
 export interface ParsedResume {
+  inferred_current_role?: string;
+  inferred_profession_domain?: string;
+  target_role_used?: string;
   skills: string[];
   experience_years: string;
   education: Education[];
@@ -248,5 +251,5 @@ export interface NormalizedJob {
   salary: string;
   description: string;
   url: string;
-  source: "linkedin" | "indeed" | "naukri";
+  source: "linkedin" | "indeed" | "naukri" | "other";
 }

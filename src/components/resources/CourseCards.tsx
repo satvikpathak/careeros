@@ -56,14 +56,14 @@ export default function CourseCards({ courses }: CourseCardProps) {
 
   return (
     <Card className="glass-card border-0 shadow-xl overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500" />
+  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 to-purple-500" />
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-bold flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-blue-500" /> Courses
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1">
+  <div className="grid sm:grid-cols-2 gap-3 max-h-130 overflow-y-auto pr-1">
           {displayedCourses.map((course, index) => (
             <motion.div
               key={index}
@@ -75,15 +75,22 @@ export default function CourseCards({ courses }: CourseCardProps) {
             >
               {/* Thumbnail */}
               <div className="relative w-full h-24 bg-gray-200 overflow-hidden">
-                <img
-                  src={course.thumbnail}
-                  alt={course.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='96' fill='%23f3f4f6'%3E%3Crect width='400' height='96' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='14'%3ECourse%3C/text%3E%3C/svg%3E";
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                {course.thumbnail ? (
+                  <img
+                    src={course.thumbnail}
+                    alt={course.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='96' fill='%23f3f4f6'%3E%3Crect width='400' height='96' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='14'%3ECourse%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs font-medium">
+                    Course Preview
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                 {course.platform && (
                   <Badge className="absolute top-2 right-2 text-[10px] bg-white/90 text-gray-700 border-0 shadow-sm">
                     {course.platform}

@@ -4,8 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
+import { Syne } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+
+const syne = Syne({ subsets: ["latin"], weight: ["800"] });
 
 type NavLink = {
   href: string;
@@ -71,15 +74,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
         >
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
-              <div className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold shadow-sm",
-                isHomePage
-                  ? "border border-white/50 bg-white/60 text-gray-900"
-                  : "border border-black/15 bg-black text-white"
-              )}>
-                CO
-              </div>
-              <span className="text-sm font-semibold text-gray-900">CareerOS</span>
+              <span className={cn(syne.className, "text-2xl leading-none font-extrabold tracking-tight text-gray-900")}>cresco</span>
             </Link>
           </div>
 

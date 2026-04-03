@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const githubUrl = formData.get("githubUrl") as string || "";
-    const targetRole = formData.get("targetRole") as string || "Software Engineer";
+  const targetRole = ((formData.get("targetRole") as string) || "").trim();
 
     if (!file) {
       return NextResponse.json(
@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
       audit = JSON.parse(jsonStr);
     } catch {
       audit = {
+        inferred_current_role: "General Professional",
+        inferred_profession_domain: "General",
+        target_role_used: targetRole || "General Professional",
         readiness_score: 0,
         market_match_score: 0,
         project_quality_score: 0,
@@ -100,6 +103,9 @@ export async function POST(req: NextRequest) {
     } catch {
       // Fallback: build from audit data
       parsedResume = {
+        inferred_current_role: audit.inferred_current_role || "General Professional",
+        inferred_profession_domain: audit.inferred_profession_domain || "General",
+        target_role_used: audit.target_role_used || targetRole || "General Professional",
         skills: Object.keys(audit.skill_map || {}),
         experience_years: "0",
         education: [],
@@ -113,7 +119,7 @@ export async function POST(req: NextRequest) {
     // 5. Generate embedding — best effort
     let embedding: number[] = [];
     try {
-      const summaryText = `${Object.keys(audit.skill_map || {}).join(", ")} ${(audit.skill_gaps || []).join(", ")} ${targetRole}`;
+  const summaryText = `${Object.keys(audit.skill_map || {}).join(", ")} ${(audit.skill_gaps || []).join(", ")} ${audit.target_role_used || targetRole || "General Professional"}`;
       embedding = await generateEmbedding(summaryText);
     } catch (embError) {
       console.warn("Embedding generation failed:", embError);
@@ -155,6 +161,9 @@ export async function POST(req: NextRequest) {
             skill_gaps: audit.skill_gaps || [],
             depth_vs_breadth: audit.depth_vs_breadth || "",
             market_alignment: audit.market_alignment_insights || "",
+            inferred_current_role: audit.inferred_current_role || parsedResume.inferred_current_role || "General Professional",
+            inferred_profession_domain: audit.inferred_profession_domain || parsedResume.inferred_profession_domain || "General",
+            target_role_used: audit.target_role_used || parsedResume.target_role_used || targetRole || "General Professional",
           },
           githubAnalysis: githubStats,
         }).returning();
