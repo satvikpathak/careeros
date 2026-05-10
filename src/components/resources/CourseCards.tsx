@@ -46,7 +46,7 @@ export default function CourseCards({ courses }: CourseCardProps) {
         <Star
           key={i}
           className={`w-3.5 h-3.5 ${
-            i < fullStars ? "text-amber-400 fill-amber-400" : "text-gray-300"
+            i < fullStars ? "text-neutral-700 fill-neutral-700" : "text-gray-300"
           }`}
         />
       );
@@ -56,14 +56,14 @@ export default function CourseCards({ courses }: CourseCardProps) {
 
   return (
     <Card className="glass-card border-0 shadow-xl overflow-hidden">
-  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 to-purple-500" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-neutral-950" />
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-bold flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-blue-500" /> Courses
+          <BookOpen className="w-5 h-5 text-neutral-700" /> Courses
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-  <div className="grid sm:grid-cols-2 gap-3 max-h-130 overflow-y-auto pr-1">
+        <div className="grid sm:grid-cols-2 gap-3 max-h-130 overflow-y-auto pr-1">
           {displayedCourses.map((course, index) => (
             <motion.div
               key={index}
@@ -71,10 +71,10 @@ export default function CourseCards({ courses }: CourseCardProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               whileHover={{ y: -2 }}
-              className="rounded-xl bg-gray-50 border border-gray-100 hover:border-indigo-100 hover:shadow-md transition-all duration-200 overflow-hidden group"
+              className="rounded-xl bg-neutral-50 border border-neutral-200 hover:border-neutral-300 hover:shadow-md transition-all duration-200 overflow-hidden group"
             >
               {/* Thumbnail */}
-              <div className="relative w-full h-24 bg-gray-200 overflow-hidden">
+              <div className="relative w-full h-24 bg-neutral-200 overflow-hidden">
                 {course.thumbnail ? (
                   <img
                     src={course.thumbnail}
@@ -86,7 +86,7 @@ export default function CourseCards({ courses }: CourseCardProps) {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs font-medium">
+                  <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-gray-500 text-xs font-medium">
                     Course Preview
                   </div>
                 )}
@@ -121,7 +121,7 @@ export default function CourseCards({ courses }: CourseCardProps) {
                 {course.description.split(" ").length > 15 && (
                   <button
                     onClick={() => toggleDescription(index)}
-                    className="text-indigo-500 hover:text-indigo-600 text-xs font-medium"
+                    className="text-neutral-700 hover:text-neutral-950 text-xs font-medium"
                   >
                     {expandedDescriptions[index] ? "Less" : "More"}
                   </button>
@@ -131,7 +131,7 @@ export default function CourseCards({ courses }: CourseCardProps) {
                   href={course.registrationLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg text-xs font-medium transition-colors"
                 >
                   Enroll <ExternalLink className="w-3 h-3" />
                 </a>
@@ -144,7 +144,7 @@ export default function CourseCards({ courses }: CourseCardProps) {
           <Button
             variant="ghost"
             onClick={() => setShowAll(!showAll)}
-            className="w-full text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium"
+            className="w-full text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100 font-medium"
           >
             {showAll ? "Show Less" : `Show All (${courses.length})`}
           </Button>
