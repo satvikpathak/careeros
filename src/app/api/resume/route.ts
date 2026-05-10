@@ -7,6 +7,11 @@ import { parseResumeWithGemini, parseResumeStructured, generateEmbedding } from 
 import pdf from "pdf-parse-fork";
 import { getGitHubProfileData } from "@/lib/github";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();

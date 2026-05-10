@@ -6,6 +6,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAI } from "@/lib/gemini";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 const QUIZ_PROMPT = `You are a technical quiz generator for CareerOS 2.0.
 Generate a multiple-choice quiz to test knowledge of specific topics in a learning roadmap phase.
 

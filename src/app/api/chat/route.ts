@@ -8,6 +8,11 @@ import {
   PLACEMENT_PREP_PROMPT,
 } from "@/lib/gemini";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
