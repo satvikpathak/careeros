@@ -27,6 +27,7 @@ import { useRoadmapStore } from "@/stores/roadmap-store";
 import type { ParsedResume } from "@/lib/types";
 import Link from "next/link";
 import { UpgradeModal } from "@/components/billing/UpgradeModal";
+import { ResumeTabs } from "./_tabs";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -246,6 +247,7 @@ export default function ResumePage() {
 
   return (
     <div className="space-y-6">
+      <ResumeTabs />
       {/* Loading previous audit */}
       {loadingPrevious && (
         <div className="flex items-center gap-3 p-4 bg-neutral-100 rounded-xl border border-neutral-200">
