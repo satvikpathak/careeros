@@ -254,8 +254,8 @@ export default function ResumePage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-emerald-500";
-    if (score >= 60) return "text-amber-500";
+    if (score >= 80) return "text-neutral-700";
+    if (score >= 60) return "text-neutral-700";
     return "text-red-500";
   };
 
@@ -270,9 +270,9 @@ export default function ResumePage() {
     <div className="space-y-6">
       {/* Loading previous audit */}
       {loadingPrevious && (
-        <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-          <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-          <p className="text-sm font-medium text-indigo-700">Loading your previous audit data...</p>
+        <div className="flex items-center gap-3 p-4 bg-neutral-100 rounded-xl border border-neutral-200">
+          <Loader2 className="w-5 h-5 text-neutral-700 animate-spin" />
+          <p className="text-sm font-medium text-neutral-700">Loading your previous audit data...</p>
         </div>
       )}
 
@@ -281,19 +281,19 @@ export default function ResumePage() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center justify-between"
+          className="bg-neutral-100 border border-neutral-200 rounded-xl p-4 flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <Target className="w-5 h-5 text-blue-600" />
+            <Target className="w-5 h-5 text-neutral-700" />
             <div>
-              <p className="font-semibold text-blue-800">Previous Audit Found</p>
-              <p className="text-sm text-blue-600">
+              <p className="font-semibold text-neutral-950">Previous Audit Found</p>
+              <p className="text-sm text-neutral-600">
                 Readiness: {previousAudit.readinessScore}% • Market Match: {previousAudit.marketMatchScore}% • Project Quality: {previousAudit.projectQualityScore}%
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+            <Button asChild size="sm" className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl">
               <Link href="/dashboard">
                 View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
@@ -307,13 +307,13 @@ export default function ResumePage() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between"
+          className="bg-neutral-100 border border-neutral-200 rounded-xl p-4 flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+            <CheckCircle2 className="w-5 h-5 text-neutral-700" />
             <div>
-              <p className="font-semibold text-emerald-800">Career Audit Saved!</p>
-              <p className="text-sm text-emerald-600">
+              <p className="font-semibold text-neutral-950">Career Audit Saved!</p>
+              <p className="text-sm text-neutral-600">
                 {roadmapStatus === "generating"
                   ? "Generating your personalized roadmap..."
                   : roadmapStatus === "done"
@@ -324,16 +324,16 @@ export default function ResumePage() {
           </div>
           <div className="flex gap-2">
             {roadmapStatus === "generating" && (
-              <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+              <Loader2 className="w-5 h-5 text-neutral-400 animate-spin" />
             )}
             {roadmapStatus === "done" && (
-              <Button asChild size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl">
+              <Button asChild size="sm" className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl">
                 <Link href="/dashboard/roadmap">
                   View Roadmap <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
               </Button>
             )}
-            <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+            <Button asChild size="sm" className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl">
               <Link href="/dashboard">
                 View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
@@ -357,10 +357,10 @@ export default function ResumePage() {
             <CardContent className="p-6">
               {/* Drop zone */}
               <label
-                className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-200 ${
+                className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
                   dragActive
-                    ? "border-indigo-400 bg-indigo-50/50"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
+                    ? "border-neutral-400 bg-neutral-50"
+                    : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
                 }`}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -379,19 +379,19 @@ export default function ResumePage() {
 
                 {isUploading || isParsing ? (
                   <div className="text-center">
-                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mx-auto mb-3" />
-                    <p className="text-sm font-medium text-gray-700">
+                    <Loader2 className="w-10 h-10 text-neutral-400 animate-spin mx-auto mb-3" />
+                    <p className="text-sm font-medium text-neutral-600">
                       {isUploading ? "Uploading..." : "Analyzing with AI..."}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">This may take a moment</p>
+                    <p className="text-xs text-neutral-400 mt-1">This may take a moment</p>
                   </div>
                 ) : (
                   <div className="text-center">
                     <Upload className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm font-medium text-gray-700">
+                    <p className="text-sm font-medium text-neutral-600">
                       Drop your resume here
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-neutral-400 mt-1">
                       PDF format, up to 10MB
                     </p>
                   </div>
@@ -400,13 +400,13 @@ export default function ResumePage() {
 
               {/* File name */}
               {fileName && (
-                <div className="flex items-center gap-2 mt-4 p-3 bg-gray-50 rounded-xl">
-                  <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span className="text-sm text-gray-700 truncate flex-1">
+                <div className="flex items-center gap-2 mt-4 p-3 bg-neutral-50 rounded-xl">
+                  <FileText className="w-4 h-4 text-neutral-700 shrink-0" />
+                  <span className="text-sm text-neutral-600 truncate flex-1">
                     {fileName}
                   </span>
                   {parsedResume && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-neutral-700 shrink-0" />
                   )}
                 </div>
               )}
@@ -420,7 +420,7 @@ export default function ResumePage() {
 
               {/* Target Role Selector */}
               <div className="mt-6">
-                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
                   Target Role (Optional)
                 </label>
                 <input
@@ -429,7 +429,7 @@ export default function ResumePage() {
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
                   placeholder="Leave blank to auto-detect (e.g., Civil Engineer, Lawyer, Product Designer)"
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+                  className="mt-2 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200"
                 />
                 <datalist id="target-role-suggestions">
                   {ROLE_SUGGESTIONS.map((role) => (
@@ -453,7 +453,7 @@ export default function ResumePage() {
               >
                 <Card className="glass-card border-0">
                   <CardContent className="p-6 text-center">
-                    <h3 className="text-sm font-medium text-gray-400 mb-4">ATS SCORE</h3>
+                    <h3 className="text-sm font-medium text-neutral-400 mb-4">ATS SCORE</h3>
                     {/* Circular progress */}
                     <div className="relative w-32 h-32 mx-auto mb-4">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
@@ -483,7 +483,7 @@ export default function ResumePage() {
                         <span className={`text-3xl font-bold ${getScoreColor(atsScore)}`}>
                           {atsScore}
                         </span>
-                        <span className="text-xs text-gray-400">/ 100</span>
+                        <span className="text-xs text-neutral-400">/ 100</span>
                       </div>
                     </div>
                     <Badge
@@ -491,7 +491,7 @@ export default function ResumePage() {
                     >
                       {getScoreLabel(atsScore)}
                     </Badge>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-neutral-400 mt-2">
                       For: {selectedRole.trim() || parsedResume.target_role_used || detectedRole}
                     </p>
                   </CardContent>
@@ -516,7 +516,7 @@ export default function ResumePage() {
                 <Card className="glass-card border-0">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-indigo-500" />
+                      <BarChart3 className="w-4 h-4 text-neutral-700" />
                       Resume Strength
                     </CardTitle>
                   </CardHeader>
@@ -534,7 +534,7 @@ export default function ResumePage() {
                 <Card className="glass-card border-0">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <Code className="w-4 h-4 text-purple-500" />
+                      <Code className="w-4 h-4 text-neutral-700" />
                       Skills Extracted
                     </CardTitle>
                   </CardHeader>
@@ -554,7 +554,7 @@ export default function ResumePage() {
                   <Card className="glass-card border-0">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-emerald-500" />
+                        <Briefcase className="w-4 h-4 text-neutral-700" />
                         Experience
                       </CardTitle>
                     </CardHeader>
@@ -568,7 +568,7 @@ export default function ResumePage() {
                   <Card className="glass-card border-0">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-blue-500" />
+                        <BookOpen className="w-4 h-4 text-neutral-700" />
                         Education
                       </CardTitle>
                     </CardHeader>
@@ -577,13 +577,13 @@ export default function ResumePage() {
                         {parsedResume.education.map((edu, i) => (
                           <div key={i}>
                             <p className="text-sm font-medium text-gray-900">{edu.degree}</p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-neutral-400">
                               {edu.institution} • {edu.year}
                             </p>
                           </div>
                         ))}
                         {parsedResume.education.length === 0 && (
-                          <p className="text-sm text-gray-400">No education data found</p>
+                          <p className="text-sm text-neutral-400">No education data found</p>
                         )}
                       </div>
                     </CardContent>
@@ -595,13 +595,13 @@ export default function ResumePage() {
                   <Card className="glass-card border-0">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-amber-500" />
+                        <Target className="w-4 h-4 text-neutral-700" />
                         Projects
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {parsedResume.projects.map((project, i) => (
-                        <div key={i} className="p-3 bg-gray-50 rounded-xl">
+                        <div key={i} className="p-3 bg-neutral-50 rounded-xl">
                           <p className="text-sm font-medium text-gray-900">{project.name}</p>
                           <p className="text-xs text-gray-500 mt-1">{project.description}</p>
                           <div className="flex flex-wrap gap-1 mt-2">
@@ -622,12 +622,12 @@ export default function ResumePage() {
                   <Card className="glass-card border-0">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-rose-500" />
+                        <TrendingUp className="w-4 h-4 text-neutral-700" />
                         Missing Keywords
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-xs text-gray-400 mb-3">
+                      <p className="text-xs text-neutral-400 mb-3">
                         Add these keywords to improve your ATS score:
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -652,7 +652,7 @@ export default function ResumePage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Upload your resume
                 </h3>
-                <p className="text-sm text-gray-400 max-w-md">
+                <p className="text-sm text-neutral-400 max-w-md">
                   Drop a PDF file in the upload area to get AI-powered resume analysis
                   including skill extraction, ATS scoring, and improvement recommendations.
                 </p>
