@@ -5,6 +5,8 @@ import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { SectionHeader } from "@/components/ui/section-header";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const KIND_LABELS: Record<string, { title: string; description: string }> = {
   welcome: { title: "Welcome email", description: "Sent once when you sign up." },
@@ -63,8 +65,18 @@ export default function SettingsPage() {
         </Card>
       )}
 
+      <Card className="p-6">
+        <p className="font-semibold text-neutral-950 mb-1">Plan & Billing</p>
+        <p className="text-sm text-neutral-500 mb-4">Manage your subscription, view usage, change plans.</p>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/billing">View pricing</Link>
+          </Button>
+        </div>
+      </Card>
+
       <Card className="p-6 text-sm text-neutral-500">
-        <p className="font-semibold text-neutral-950 mb-1">Profile · Plan & Billing</p>
+        <p className="font-semibold text-neutral-950 mb-1">Profile</p>
         <p>Coming soon.</p>
       </Card>
     </div>
