@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, jsonb, decimal, varchar, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, jsonb, decimal, varchar, boolean, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -87,3 +87,52 @@ export const auditJobs = pgTable("audit_jobs", {
   startedAt: timestamp("started_at"),
   finishedAt: timestamp("finished_at"),
 });
+
+export const applications = pgTable(
+  "applications",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    jobTitle: varchar("job_title", { length: 512 }).notNull(),
+    company: varchar("company", { length: 255 }).notNull(),
+    location: varchar("location", { length: 255 }),
+    sourceUrl: varchar("source_url", { length: 1024 }),
+    jobSnapshot: jsonb("job_snapshot"),
+    status: varchar("status", { length: 30 }).notNull().default("saved"),
+    notes: text("notes"),
+    appliedAt: timestamp("applied_at"),
+    nextActionAt: timestamp("next_action_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  }
+);
+
+export const dailyCheckins = pgTable(
+  "daily_checkins",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    checkinDate: varchar("checkin_date", { length: 10 }).notNull(),
+    summary: text("summary"),
+    applicationsSent: integer("applications_sent").default(0),
+    hoursStudied: decimal("hours_studied", { precision: 4, scale: 1 }).default("0"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (t) => ({
+    userDateUnique: uniqueIndex("daily_checkins_user_date_unique").on(t.userId, t.checkinDate),
+  })
+);
+
+export const emailSubscriptions = pgTable(
+  "email_subscriptions",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    kind: varchar("kind", { length: 50 }).notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (t) => ({
+    userKindUnique: uniqueIndex("email_subscriptions_user_kind_unique").on(t.userId, t.kind),
+  })
+);
