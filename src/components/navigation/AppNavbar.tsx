@@ -50,7 +50,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
           "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold transition",
           isHomePage
             ? "border border-white/50 bg-white/30 text-gray-900 shadow-md backdrop-blur-md hover:bg-white/45"
-            : "bg-black text-white shadow-md hover:shadow-lg"
+            : "bg-neutral-950 text-white hover:bg-neutral-800 shadow-sm"
         )}
       >
         {ctaLabel}
@@ -69,7 +69,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
             "pointer-events-auto flex w-full max-w-6xl items-center justify-between rounded-xl px-4 py-3 backdrop-blur-md transition sm:px-6",
             isHomePage
               ? "border border-white/30 bg-white/40 shadow-lg shadow-indigo-200/30"
-              : "border border-black/10 bg-white/80 shadow-md"
+              : "border border-neutral-200 bg-white/95 backdrop-blur-md shadow-sm"
           )}
         >
           <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
               "md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-700",
               isHomePage
                 ? "border border-white/50 bg-white/50 shadow"
-                : "border border-black/15 bg-white shadow-sm"
+                : "border border-neutral-200 bg-white shadow-sm"
             )}
             onClick={() => setOpen((o: boolean) => !o)}
           >
@@ -128,7 +128,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
                 "md:hidden mt-2 w-full max-w-6xl rounded-xl p-4 backdrop-blur-md",
                 isHomePage
                   ? "border border-white/40 bg-white/70 shadow-lg"
-                  : "border border-black/10 bg-white/95 shadow-md"
+                  : "border border-neutral-200 bg-white shadow-sm"
               )}
             >
               <div className="flex flex-col gap-3 text-sm font-semibold text-gray-800">
@@ -142,7 +142,7 @@ export default function AppNavbar({ links, ctaHref = "/sign-up", ctaLabel = "Sig
                     <Link
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-2 py-2 transition-colors hover:bg-black/5"
+                      className="block rounded-lg px-2 py-2 transition-colors hover:bg-neutral-100"
                     >
                       {link.label}
                     </Link>
