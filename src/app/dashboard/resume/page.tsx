@@ -17,6 +17,7 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
+import { AuditProgress } from "@/components/audit/AuditProgress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -46,6 +47,7 @@ export default function ResumePage() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<number | null>(null);
   const [selectedRole, setSelectedRole] = useState("");
   const [detectedRole, setDetectedRole] = useState<string>("General Professional");
   const [detectedDomain, setDetectedDomain] = useState<string>("General");
@@ -179,58 +181,24 @@ export default function ResumePage() {
     setAuditSaved(false);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-  formData.append("targetRole", selectedRole.trim());
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("githubUrl", "");
+      fd.append("targetRole", selectedRole.trim());
 
-      const response = await fetch("/api/resume", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const parsed: ParsedResume = data.data.parsed_data;
-        setParsedResume(parsed);
-
-        const inferredRole = parsed.inferred_current_role || data.data.audit?.inferred_current_role || "General Professional";
-        const inferredDomain = parsed.inferred_profession_domain || data.data.audit?.inferred_profession_domain || "General";
-        const resolvedTargetRole = selectedRole.trim() || parsed.target_role_used || data.data.audit?.target_role_used || inferredRole;
-
-        setDetectedRole(inferredRole);
-        setDetectedDomain(inferredDomain);
-        if (!selectedRole.trim()) {
-          setSelectedRole(resolvedTargetRole);
-        }
-
-        // Track whether audit was saved to DB
-        if (data.data.dbSaved) {
-          setAuditSaved(true);
-          // Auto-generate personalized roadmap from audit data
-          generateRoadmapFromAudit(data.data.audit, parsed, resolvedTargetRole);
-        } else if (data.data.dbSaveError) {
-          console.warn("Audit DB save issue:", data.data.dbSaveError);
-          // Still generate roadmap even if DB save failed
-          generateRoadmapFromAudit(data.data.audit, parsed, resolvedTargetRole);
-        }
-
-        // Dynamic role-fit score from universal audit output
-        const marketMatch = Number(data.data.audit?.market_match_score);
-        const readiness = Number(data.data.audit?.readiness_score);
-        const fallbackScore = Number(parsed.strength_score || 0);
-        const dynamicScore = Number.isFinite(marketMatch)
-          ? marketMatch
-          : Number.isFinite(readiness)
-          ? readiness
-          : fallbackScore;
-        setAtsScore(Math.max(0, Math.min(100, Math.round(dynamicScore))));
-      } else {
-        setError(data.error || "Failed to parse resume");
+      const res = await fetch("/api/audit/start", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.error || "Audit failed to start");
+        setUploading(false);
+        setParsing(false);
+        return;
       }
+      setJobId(json.data.jobId);
+      setUploading(false);
+      setParsing(false);
     } catch {
       setError("Upload failed. Please try again.");
-    } finally {
       setUploading(false);
       setParsing(false);
     }
@@ -640,6 +608,26 @@ export default function ResumePage() {
                     </CardContent>
                   </Card>
                 )}
+              </motion.div>
+            ) : jobId ? (
+              <motion.div
+                key="progress"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <AuditProgress
+                  jobId={jobId}
+                  onComplete={() => {
+                    fetch("/api/dashboard/data", { cache: "no-store" })
+                      .then((r) => r.json())
+                      .then((j) => {
+                        if (j.success && j.data?.audit) {
+                          window.location.reload();
+                        }
+                      });
+                  }}
+                  onError={(err) => setError(err)}
+                />
               </motion.div>
             ) : (
               <motion.div
