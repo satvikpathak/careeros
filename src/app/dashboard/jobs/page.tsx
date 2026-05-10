@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useJobsStore } from "@/stores/jobs-store";
 import { useProfileStore } from "@/stores/profile-store";
 import type { NormalizedJob } from "@/lib/types";
+import { SaveToTrackerButton } from "@/components/applications/SaveToTrackerButton";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -340,19 +341,29 @@ export default function JobsPage() {
                         )}
                       </div>
 
-                      {/* Apply button */}
-                      {job.url && job.url !== "#" && (
-                        <a
-                          href={job.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="shrink-0 self-center"
-                        >
-                          <Button variant="outline" size="sm" className="glass-card text-xs gap-1">
-                            Apply <ExternalLink className="w-3 h-3" />
-                          </Button>
-                        </a>
-                      )}
+                      {/* Apply + Save buttons */}
+                      <div className="flex items-center gap-2 shrink-0 self-center">
+                        <SaveToTrackerButton
+                          job={{
+                            title: job.title,
+                            company: job.company,
+                            location: job.location,
+                            url: job.url,
+                            description: job.description,
+                          }}
+                        />
+                        {job.url && job.url !== "#" && (
+                          <a
+                            href={job.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" size="sm" className="glass-card text-xs gap-1">
+                              Apply <ExternalLink className="w-3 h-3" />
+                            </Button>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

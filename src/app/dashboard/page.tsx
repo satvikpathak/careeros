@@ -1,13 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   motion,
-  AnimatePresence,
-  useMotionValue,
-  useTransform,
-  animate,
-  useInView,
   type Variants,
 } from "framer-motion";
 import {
@@ -35,7 +30,6 @@ import {
   Circle,
   ArrowRight,
   Sparkles,
-  Trophy,
   Rocket,
   Shield,
   Lightbulb,
@@ -61,6 +55,8 @@ import { StatCard } from "@/components/ui/stat-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AuditProgress } from "@/components/audit/AuditProgress";
+import { NeedsAttentionWidget } from "@/components/dashboard/NeedsAttentionWidget";
+import { CheckinWidget } from "@/components/dashboard/CheckinWidget";
 
 /* ============================================ */
 /* Animation Variants                           */
@@ -108,42 +104,6 @@ const scaleIn: Variants = {
     transition: { type: "spring", stiffness: 400, damping: 20 },
   },
 };
-
-/* ============================================ */
-/* AnimatedCounter Component                    */
-/* ============================================ */
-
-function AnimatedCounter({
-  value,
-  suffix = "",
-  prefix = "",
-  decimals = 0,
-  duration = 1.5,
-}: {
-  value: number;
-  suffix?: string;
-  prefix?: string;
-  decimals?: number;
-  duration?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const motionValue = useMotionValue(0);
-  const display = useTransform(motionValue, (v) => {
-    return `${prefix}${v.toFixed(decimals)}${suffix}`;
-  });
-
-  useEffect(() => {
-    if (isInView) {
-      animate(motionValue, value, {
-        duration,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      });
-    }
-  }, [isInView, value, motionValue, duration]);
-
-  return <motion.span ref={ref}>{display}</motion.span>;
-}
 
 /* ============================================ */
 /* Live Activity Item                           */
@@ -388,15 +348,8 @@ export default function DashboardPage() {
         eyebrow="CareerOS"
         title={`Welcome back, ${user.name?.split(" ")[0] || "Developer"}`}
         description="Your career intelligence overview."
-        actions={
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5">
-            <Trophy className="h-3.5 w-3.5 text-neutral-700" />
-            <span className="text-[12px] font-semibold text-neutral-950">
-              <AnimatedCounter value={user.streak || 0} suffix=" day streak" />
-            </span>
-          </div>
-        }
       />
+      <CheckinWidget />
 
       {activeJobId && (
         <AuditProgress
@@ -905,8 +858,10 @@ export default function DashboardPage() {
           variants={fadeUp}
           className="lg:col-span-4"
         >
+          <NeedsAttentionWidget />
+
           <div
-            className="bg-white rounded-xl border border-neutral-200 p-5 lg:sticky lg:top-24"
+            className="bg-white rounded-xl border border-neutral-200 p-5 lg:sticky lg:top-24 mt-6"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <div className="flex items-center justify-between mb-4">
