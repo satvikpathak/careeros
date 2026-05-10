@@ -7,7 +7,23 @@ import { parseResumeWithGemini, parseResumeStructured, generateEmbedding } from 
 import pdf from "pdf-parse-fork";
 import { getGitHubProfileData } from "@/lib/github";
 
+import { auditFingerprint } from "@/lib/audit-fingerprint";
 import type { HeavyRouteConfig } from "@/lib/runtime-config";
+
+// In-memory short-window dedupe (per server instance). 30 second window is
+// enough to absorb double-submits without breaking legitimate re-runs.
+const RECENT_FINGERPRINTS = new Map<string, number>();
+const DEDUPE_WINDOW_MS = 30_000;
+
+function isRecentFingerprint(fp: string): boolean {
+  const now = Date.now();
+  for (const [k, t] of RECENT_FINGERPRINTS) {
+    if (now - t > DEDUPE_WINDOW_MS) RECENT_FINGERPRINTS.delete(k);
+  }
+  if (RECENT_FINGERPRINTS.has(fp)) return true;
+  RECENT_FINGERPRINTS.set(fp, now);
+  return false;
+}
 export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
 export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
 export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
@@ -38,6 +54,23 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
     const pdfData = await pdf(buffer);
     const resumeText = pdfData.text;
+
+    // Best-effort dedupe — only when authenticated, otherwise no-op.
+    try {
+      const { auth } = await import("@clerk/nextjs/server");
+      const { userId: clerkId } = await auth();
+      if (clerkId) {
+        const fp = auditFingerprint(clerkId, resumeText, targetRole);
+        if (isRecentFingerprint(fp)) {
+          return NextResponse.json(
+            { success: false, error: "Duplicate submission — please wait a moment before retrying." },
+            { status: 429 }
+          );
+        }
+      }
+    } catch {
+      // Non-fatal: missing auth in dev shouldn't block the audit.
+    }
 
     if (!resumeText || resumeText.trim().length === 0) {
       return NextResponse.json(
