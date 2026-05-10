@@ -60,6 +60,7 @@ import { useRoadmapStore } from "@/stores/roadmap-store";
 import { StatCard } from "@/components/ui/stat-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AuditProgress } from "@/components/audit/AuditProgress";
 
 /* ============================================ */
 /* Animation Variants                           */
@@ -228,10 +229,21 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "sprints" | "projects">("overview");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const { setRoadmap, setAuditContext, roadmap: storeRoadmap } = useRoadmapStore();
 
   useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/audit/latest-job", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success && j.data && (j.data.status === "queued" || j.data.status === "running")) {
+          setActiveJobId(j.data.id);
+        }
+      });
   }, []);
 
   const fetchDashboardData = async () => {
@@ -297,16 +309,6 @@ export default function DashboardPage() {
     }));
   }, [data]);
 
-  const marketTrends = [
-    { month: "Jan", revenue: 42, sessions: 35, conversion: 28 },
-    { month: "Feb", revenue: 55, sessions: 48, conversion: 35 },
-    { month: "Mar", revenue: 48, sessions: 42, conversion: 32 },
-    { month: "Apr", revenue: 72, sessions: 60, conversion: 45 },
-    { month: "May", revenue: 68, sessions: 55, conversion: 40 },
-    { month: "Jun", revenue: 85, sessions: 70, conversion: 52 },
-    { month: "Jul", revenue: 80, sessions: 65, conversion: 48 },
-  ];
-
   const topPerformers = useMemo(() => {
     if (!data?.audit?.skillMap) return [];
     const entries = Object.entries(data.audit.skillMap);
@@ -365,6 +367,15 @@ export default function DashboardPage() {
       100
     : 0;
 
+  const auditTrend = data?.auditTrend || [];
+  const trendChartData = auditTrend.length > 0
+    ? auditTrend.map((p: any) => ({
+        month: new Date(p.date).toLocaleDateString("en", { month: "short", day: "numeric" }),
+        readiness: p.readiness,
+        market: p.marketMatch,
+      }))
+    : [{ month: "—", readiness: 0, market: 0 }];
+
   return (
     <motion.div
       variants={staggerContainer}
@@ -386,6 +397,17 @@ export default function DashboardPage() {
           </div>
         }
       />
+
+      {activeJobId && (
+        <AuditProgress
+          jobId={activeJobId}
+          onComplete={() => {
+            setActiveJobId(null);
+            fetchDashboardData();
+          }}
+          onError={() => setActiveJobId(null)}
+        />
+      )}
 
       {/* ==================== KPI CARDS ==================== */}
       <motion.div
@@ -461,7 +483,7 @@ export default function DashboardPage() {
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={marketTrends}>
+                <AreaChart data={trendChartData}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#0A0A0A" stopOpacity={0.15} />
@@ -503,7 +525,7 @@ export default function DashboardPage() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="revenue"
+                    dataKey="readiness"
                     name="Readiness"
                     stroke="#0A0A0A"
                     strokeWidth={2.5}
@@ -512,21 +534,12 @@ export default function DashboardPage() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="sessions"
-                    name="Skills"
+                    dataKey="market"
+                    name="Market"
                     stroke="#737373"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorSessions)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="conversion"
-                    name="Market"
-                    stroke="#A3A3A3"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorConversion)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -536,8 +549,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-6 mt-4 pt-4 border-t border-neutral-200">
               {[
                 { label: "Readiness", color: "#0A0A0A" },
-                { label: "Skills", color: "#737373" },
-                { label: "Market Fit", color: "#A3A3A3" },
+                { label: "Market Fit", color: "#737373" },
               ].map((l) => (
                 <div key={l.label} className="flex items-center gap-2">
                   <div
