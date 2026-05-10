@@ -27,6 +27,7 @@ export default function DashboardClientLayout({ children }: { children: React.Re
     { href: "/dashboard/applications", label: "Applications" },
     { href: "/dashboard/resources", label: "Resources" },
     { href: "/dashboard/chat", label: "AI Interview" },
+    { href: "/dashboard/tools", label: "Tools" },
     { href: "/dashboard/settings", label: "Settings" },
     { href: "/dashboard/billing", label: "Billing" },
   ];
