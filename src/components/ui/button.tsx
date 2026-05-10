@@ -8,37 +8,30 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black/20 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-sm",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-900/20 aria-invalid:ring-red-500/20 aria-invalid:border-red-500",
   {
     variants: {
       variant: {
-        default: "bg-black text-white border border-black shadow-md hover:bg-zinc-800",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border border-gray-200/70 bg-white/70 backdrop-blur-md text-gray-700 hover:-translate-y-0.5 hover:shadow-md",
-        secondary:
-          "bg-white/60 text-gray-900 border border-white/70 hover:-translate-y-0.5 hover:shadow-md",
-        ghost:
-          "text-gray-700 hover:bg-white/60 hover:text-gray-900 border border-transparent",
-        link: "text-primary underline-offset-4 hover:underline",
-        glass: "bg-white/30 text-gray-900 border border-white/50 backdrop-blur-xl hover:-translate-y-0.5",
+        default: "bg-neutral-950 text-white hover:bg-neutral-800 shadow-sm",
+        destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
+        outline: "border border-neutral-300 bg-white text-neutral-950 hover:bg-neutral-50 shadow-sm",
+        secondary: "bg-neutral-100 text-neutral-950 hover:bg-neutral-200",
+        ghost: "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950",
+        link: "text-neutral-950 underline-offset-4 hover:underline",
+        glass: "bg-white/30 text-neutral-900 border border-white/50 backdrop-blur-xl hover:-translate-y-0.5",
       },
       size: {
-        default: "h-10 px-5 py-2.5 has-[>svg]:px-4",
-        xs: "h-7 gap-1 rounded-lg px-2.5 text-xs has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-9 rounded-lg gap-1.5 px-4 has-[>svg]:px-3",
-        lg: "h-11 rounded-xl px-7 has-[>svg]:px-5",
+        default: "h-10 px-4 py-2 has-[>svg]:px-3",
+        xs: "h-7 gap-1 rounded-md px-2.5 text-xs has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-9 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-11 rounded-lg px-6 has-[>svg]:px-4",
         icon: "size-10",
-        "icon-xs": "size-7 rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        "icon-xs": "size-7 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-9",
         "icon-lg": "size-12",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    defaultVariants: { variant: "default", size: "default" },
   }
 )
 
@@ -67,7 +60,7 @@ const RawButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 RawButton.displayName = "RawButton"
 
 function Button({ disabled, ...props }: ButtonProps) {
-  const hover = disabled ? undefined : { y: -2, scale: 1.01 }
+  const hover = disabled ? undefined : { y: -1 }
   const tap = disabled ? undefined : { y: 0, scale: 0.98 }
 
   return (
