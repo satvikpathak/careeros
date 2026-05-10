@@ -231,3 +231,26 @@ export const gapReports = pgTable("gap_reports", {
   suggestions: jsonb("suggestions"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const outreachDrafts = pgTable("outreach_drafts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  jdId: integer("jd_id").references(() => jds.id),
+  recipientName: varchar("recipient_name", { length: 255 }),
+  recipientTitle: varchar("recipient_title", { length: 255 }),
+  emailSubject: varchar("email_subject", { length: 512 }).notNull(),
+  emailBody: text("email_body").notNull(),
+  dmBody: text("dm_body").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const simulations = pgTable("simulations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  targetSkills: jsonb("target_skills"),
+  horizonMonths: integer("horizon_months").notNull(),
+  series: jsonb("series"),
+  suggestedSkills: jsonb("suggested_skills"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

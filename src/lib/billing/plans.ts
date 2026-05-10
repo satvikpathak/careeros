@@ -1,5 +1,5 @@
 export type PlanKey = "free" | "pro" | "team";
-export type UsageKind = "audit" | "chat" | "roadmap" | "sprint_regen" | "rewriter" | "cover_letter";
+export type UsageKind = "audit" | "chat" | "roadmap" | "sprint_regen" | "rewriter" | "cover_letter" | "outreach" | "simulation";
 
 export interface PlanQuotas {
   auditPerMonth: number;
@@ -70,5 +70,8 @@ export function getQuota(plan: PlanKey, kind: UsageKind): number {
       return plan === "free" ? 0 : Infinity;
     case "rewriter": return q.rewriter ? Infinity : 0;
     case "cover_letter": return q.coverLetter ? Infinity : 0;
+    case "outreach":
+    case "simulation":
+      return plan === "free" ? 0 : Infinity;
   }
 }
