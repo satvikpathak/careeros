@@ -17,9 +17,8 @@ async function readPdf(s3Url: string): Promise<Buffer> {
     const fs = (await import("node:fs/promises")).default;
     return fs.readFile(path);
   }
-  const res = await fetch(s3Url);
-  if (!res.ok) throw new Error(`S3 fetch failed: ${res.status}`);
-  return Buffer.from(await res.arrayBuffer());
+  const { downloadFromS3 } = await import("@/lib/s3");
+  return downloadFromS3(s3Url);
 }
 
 export async function runAuditJob(jobId: number): Promise<void> {
