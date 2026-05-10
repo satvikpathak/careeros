@@ -22,6 +22,13 @@
       "when": 1778423214670,
       "tag": "0002_same_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778428238850,
+      "tag": "0003_soft_wrecker",
+      "breakpoints": true
     }
   ]
 }

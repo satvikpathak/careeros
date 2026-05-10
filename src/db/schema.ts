@@ -183,3 +183,51 @@ export const webhookEvents = pgTable(
     providerExternalUnique: uniqueIndex("webhook_events_provider_external_unique").on(t.provider, t.externalId),
   })
 );
+
+export const jds = pgTable(
+  "jds",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    sourceUrl: varchar("source_url", { length: 1024 }),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    rawText: text("raw_text").notNull(),
+    parsed: jsonb("parsed"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (t) => ({
+    userHashUnique: uniqueIndex("jds_user_hash_unique").on(t.userId, t.contentHash),
+  })
+);
+
+export const resumeVersions = pgTable("resume_versions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  jdId: integer("jd_id").references(() => jds.id),
+  sourceKind: varchar("source_kind", { length: 10 }).notNull(),
+  originalTex: text("original_tex"),
+  modifiedTex: text("modified_tex"),
+  rewrittenBullets: jsonb("rewritten_bullets"),
+  diffSegments: jsonb("diff_segments"),
+  status: varchar("status", { length: 20 }).notNull().default("ready"),
+  error: text("error"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const coverLetters = pgTable("cover_letters", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  jdId: integer("jd_id").references(() => jds.id),
+  tone: varchar("tone", { length: 30 }).notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const gapReports = pgTable("gap_reports", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  jdId: integer("jd_id").references(() => jds.id),
+  coverage: jsonb("coverage"),
+  suggestions: jsonb("suggestions"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
