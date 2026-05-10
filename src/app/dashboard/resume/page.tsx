@@ -470,7 +470,7 @@ export default function ResumePage() {
                           cy="60"
                           r="50"
                           fill="none"
-                          stroke={atsScore >= 80 ? "#10b981" : atsScore >= 60 ? "#f59e0b" : "#ef4444"}
+                          stroke={atsScore >= 80 ? "#10b981" : atsScore >= 60 ? "#CA8A04" : "#ef4444"}
                           strokeWidth="10"
                           strokeLinecap="round"
                           strokeDasharray={`${(atsScore / 100) * 314} 314`}
