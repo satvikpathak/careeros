@@ -16,11 +16,11 @@ export default function DashboardHeader() {
         {/* Left: Search */}
         <div className="flex items-center gap-4 flex-1">
           <div className="relative max-w-md w-full hidden sm:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
             <input
               type="text"
               placeholder="Search anything..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm text-[#020617] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#005BB7]/30 focus:ring-2 focus:ring-[#005BB7]/10 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-neutral-200 rounded-xl text-sm text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 transition-all"
             />
           </div>
         </div>
@@ -30,7 +30,7 @@ export default function DashboardHeader() {
           <motion.button
             whileHover={{ scale: 1.05, rotate: 15 }}
             whileTap={{ scale: 0.95 }}
-            className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[#9CA3AF] hover:text-[#4B5563] hover:bg-gray-100 transition-colors"
+            className="w-9 h-9 rounded-xl bg-gray-50 border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-gray-100 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </motion.button>
@@ -38,7 +38,7 @@ export default function DashboardHeader() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="relative w-9 h-9 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[#9CA3AF] hover:text-[#4B5563] hover:bg-gray-100 transition-colors"
+            className="relative w-9 h-9 rounded-xl bg-gray-50 border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-gray-100 transition-colors"
           >
             <Bell className="w-4 h-4" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#EF4444]" />

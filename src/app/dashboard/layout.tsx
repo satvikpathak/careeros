@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import AppNavbar from "@/components/navigation/AppNavbar";
+import { UsageChip } from "@/components/ui/usage-chip";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 
 export default function DashboardLayout({
@@ -31,18 +32,19 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFBFF]">
+    <div className="min-h-screen bg-neutral-50">
       <AppNavbar
         links={navLinks}
         rightSlot={(
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              elements: {
-                userButtonAvatarBox: "w-9 h-9 border border-gray-200",
-              },
-            }}
-          />
+          <div className="flex items-center gap-3">
+            <UsageChip />
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                elements: { userButtonAvatarBox: "w-9 h-9 border border-neutral-200" },
+              }}
+            />
+          </div>
         )}
       />
 
