@@ -107,11 +107,11 @@ function QuizModal({
         className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white z-10 p-6 pb-4 border-b border-gray-100 rounded-t-3xl">
+        <div className="sticky top-0 bg-white z-10 p-6 pb-4 border-b border-neutral-200 rounded-t-3xl">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-purple-500" />
+                <Brain className="w-5 h-5 text-neutral-700" />
                 {phaseName} Quiz
               </h3>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -120,7 +120,7 @@ function QuizModal({
                   : `Question ${currentQ + 1} of ${questions.length}`}
               </p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors" title="Close quiz">
+            <button onClick={onClose} className="p-2 hover:bg-neutral-100 rounded-xl transition-colors" title="Close quiz">
               <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
@@ -132,10 +132,10 @@ function QuizModal({
                   key={i}
                   className={`flex-1 h-1.5 rounded-full transition-colors ${
                     answers[questions[i].id] !== undefined
-                      ? "bg-purple-500"
+                      ? "bg-neutral-700"
                       : i === currentQ
-                      ? "bg-purple-200"
-                      : "bg-gray-100"
+                      ? "bg-neutral-300"
+                      : "bg-neutral-100"
                   }`}
                 />
               ))}
@@ -149,11 +149,11 @@ function QuizModal({
             /* Results view */
             <div className="space-y-4">
               {/* Score card */}
-              <div className={`text-center p-6 rounded-2xl ${score >= 4 ? "bg-emerald-50" : score >= 3 ? "bg-amber-50" : "bg-red-50"}`}>
-                <Trophy className={`w-12 h-12 mx-auto mb-3 ${score >= 4 ? "text-emerald-500" : score >= 3 ? "text-amber-500" : "text-red-500"}`} />
+              <div className={`text-center p-6 rounded-xl ${score >= 4 ? "bg-neutral-100" : score >= 3 ? "bg-neutral-100" : "bg-red-50"}`}>
+                <Trophy className={`w-12 h-12 mx-auto mb-3 ${score >= 4 ? "text-neutral-700" : score >= 3 ? "text-neutral-700" : "text-red-500"}`} />
                 <p className="text-3xl font-black">{score}/{questions.length}</p>
-                <p className={`text-sm font-semibold mt-1 ${score >= 4 ? "text-emerald-600" : score >= 3 ? "text-amber-600" : "text-red-600"}`}>
-                  {score >= 4 ? "Excellent! You've mastered this phase." : score >= 3 ? "Good job! Review a few topics." : "Keep studying — you'll get there!"}
+                <p className={`text-sm font-semibold mt-1 ${score >= 4 ? "text-neutral-700" : score >= 3 ? "text-neutral-700" : "text-red-600"}`}>
+                  {score >= 4 ? "Excellent! You&apos;ve mastered this phase." : score >= 3 ? "Good job! Review a few topics." : "Keep studying — you’ll get there!"}
                 </p>
               </div>
 
@@ -162,7 +162,7 @@ function QuizModal({
                 const selected = answers[q.id];
                 const isCorrect = selected === q.correct;
                 return (
-                  <div key={q.id} className={`p-4 rounded-xl border ${isCorrect ? "bg-emerald-50/50 border-emerald-200" : "bg-red-50/50 border-red-200"}`}>
+                  <div key={q.id} className={`p-4 rounded-xl border ${isCorrect ? "bg-neutral-50 border-neutral-200" : "bg-red-50/50 border-red-200"}`}>
                     <p className="font-medium text-gray-900 text-sm mb-2">{i + 1}. {q.question}</p>
                     <div className="space-y-1.5">
                       {q.options.map((opt, oi) => (
@@ -170,7 +170,7 @@ function QuizModal({
                           key={oi}
                           className={`px-3 py-1.5 rounded-lg text-sm ${
                             oi === q.correct
-                              ? "bg-emerald-100 text-emerald-700 font-semibold"
+                              ? "bg-neutral-100 text-neutral-700 font-semibold"
                               : oi === selected && oi !== q.correct
                               ? "bg-red-100 text-red-700 line-through"
                               : "text-gray-500"
@@ -198,8 +198,8 @@ function QuizModal({
                     onClick={() => handleAnswer(q.id, oi)}
                     className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm ${
                       answers[q.id] === oi
-                        ? "border-purple-400 bg-purple-50 text-purple-700 font-medium ring-2 ring-purple-200"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                        ? "border-neutral-400 bg-neutral-100 text-neutral-950 font-medium ring-2 ring-neutral-200"
+                        : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50 text-gray-700"
                     }`}
                   >
                     <span className="font-bold mr-2 text-gray-400">
@@ -224,7 +224,7 @@ function QuizModal({
                   <Button
                     onClick={() => setCurrentQ(currentQ + 1)}
                     disabled={answers[q.id] === undefined}
-                    className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                    className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl"
                   >
                     Next
                   </Button>
@@ -232,7 +232,7 @@ function QuizModal({
                   <Button
                     onClick={handleSubmit}
                     disabled={Object.keys(answers).length < questions.length}
-                    className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                    className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl"
                   >
                     Submit Quiz
                   </Button>
@@ -278,7 +278,7 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
       {/* YouTube */}
       {ytCount > 0 && (
         <div className="space-y-2">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+          <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1.5">
             <Youtube className="w-3.5 h-3.5" /> YouTube ({ytCount})
           </h5>
           {resources.youtube_playlists!.slice(0, 3).map((pl: any, i: number) => (
@@ -287,16 +287,16 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
               href={pl.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 p-2.5 rounded-lg bg-red-50/50 hover:bg-red-50 border border-red-100/50 transition-colors group"
+              className="flex items-center gap-3 p-2.5 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
-                <Youtube className="w-4 h-4 text-red-500" />
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
+                <Youtube className="w-4 h-4 text-neutral-700" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-red-600 transition-colors">{pl.title}</p>
+                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-neutral-950 transition-colors">{pl.title}</p>
                 <p className="text-xs text-gray-400">{pl.channel}</p>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-red-400 shrink-0" />
+              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-neutral-700 shrink-0" />
             </a>
           ))}
         </div>
@@ -305,7 +305,7 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
       {/* Courses */}
       {courseCount > 0 && (
         <div className="space-y-2">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+          <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5" /> Courses ({courseCount})
           </h5>
           {resources.courses!.slice(0, 2).map((c: any, i: number) => (
@@ -314,16 +314,16 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
               href={c.registrationLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 p-2.5 rounded-lg bg-blue-50/50 hover:bg-blue-50 border border-blue-100/50 transition-colors group"
+              className="flex items-center gap-3 p-2.5 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                <BookOpen className="w-4 h-4 text-blue-500" />
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
+                <BookOpen className="w-4 h-4 text-neutral-700" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{c.name}</p>
+                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-neutral-950 transition-colors">{c.name}</p>
                 <p className="text-xs text-gray-400">{c.platform} • {c.workload}</p>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-400 shrink-0" />
+              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-neutral-700 shrink-0" />
             </a>
           ))}
         </div>
@@ -332,7 +332,7 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
       {/* Blogs */}
       {blogCount > 0 && (
         <div className="space-y-2">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <h5 className="text-xs font-bold uppercase tracking-wider text-neutral-700 flex items-center gap-1.5">
             <FileText className="w-3.5 h-3.5" /> Articles ({blogCount})
           </h5>
           {resources.blogs!.slice(0, 2).map((b: any, i: number) => (
@@ -341,16 +341,16 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
               href={b.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 p-2.5 rounded-lg bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100/50 transition-colors group"
+              className="flex items-center gap-3 p-2.5 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4 text-emerald-500" />
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4 text-neutral-700" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-emerald-600 transition-colors">{b.title}</p>
+                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-neutral-950 transition-colors">{b.title}</p>
                 <p className="text-xs text-gray-400">{b.author}</p>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-emerald-400 shrink-0" />
+              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-neutral-700 shrink-0" />
             </a>
           ))}
         </div>
@@ -359,7 +359,7 @@ function PhaseResourcesView({ phaseIndex }: { phaseIndex: number }) {
       {/* View all resources link */}
       <Link
         href={`/dashboard/resources`}
-        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 pt-1"
+        className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 hover:text-neutral-950 pt-1"
       >
         View all resources <ArrowRight className="w-3 h-3" />
       </Link>
@@ -536,7 +536,7 @@ export default function RoadmapPage() {
       <motion.div initial="hidden" animate="visible" variants={fadeIn}>
         <Badge
           variant="secondary"
-          className="mb-2 px-3 py-1 bg-indigo-50 text-indigo-600 border-indigo-100 flex items-center gap-1.5 w-fit"
+          className="mb-2 px-3 py-1 bg-neutral-100 text-neutral-700 border-neutral-200 flex items-center gap-1.5 w-fit"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" /> AI-Powered Roadmaps
         </Badge>
@@ -560,13 +560,13 @@ export default function RoadmapPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Generate a new roadmap (e.g., Machine Learning, Web Development)"
-              className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white border border-gray-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900 placeholder-gray-400 font-medium transition-all"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-neutral-200 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100 outline-none text-gray-900 placeholder-gray-400 font-medium transition-all"
             />
           </div>
           <Button
             type="submit"
             disabled={loading || !query.trim()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl px-8 shadow-lg shadow-indigo-100 disabled:opacity-50"
+            className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl px-8 shadow-sm disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Generate"}
           </Button>
@@ -584,7 +584,7 @@ export default function RoadmapPage() {
                   <button
                     key={skill}
                     onClick={() => { setQuery(skill); generateRoadmap(skill); }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 text-sm font-medium transition-colors border border-rose-100"
+                    className="px-3 py-1.5 rounded-xl bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-sm font-medium transition-colors border border-neutral-200"
                   >
                     + {skill}
                   </button>
@@ -599,7 +599,7 @@ export default function RoadmapPage() {
                 <button
                   key={topic}
                   onClick={() => { setQuery(topic); generateRoadmap(topic); }}
-                  className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-sm font-medium transition-colors border border-indigo-100"
+                  className="px-3 py-1.5 rounded-xl bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-sm font-medium transition-colors border border-neutral-200"
                 >
                   {topic}
                 </button>
@@ -612,7 +612,7 @@ export default function RoadmapPage() {
       {/* Loading */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+          <Loader2 className="w-12 h-12 text-neutral-400 animate-spin mb-4" />
           <p className="text-gray-500 font-medium animate-pulse">
             {isGenerating ? "Building your personalized roadmap from audit..." : "Generating your roadmap..."}
           </p>
@@ -641,13 +641,13 @@ export default function RoadmapPage() {
           >
             {/* Title Card */}
             <Card className="glass-premium border-0 shadow-xl overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-purple-600" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-neutral-950" />
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       {sourceType === "auto" && (
-                        <Badge className="bg-emerald-50 text-emerald-600 border-emerald-200 text-[10px]">
+                        <Badge className="bg-neutral-100 text-neutral-700 border-neutral-200 text-[10px]">
                           <Zap className="w-3 h-3 mr-0.5" /> Auto-Generated
                         </Badge>
                       )}
@@ -657,16 +657,16 @@ export default function RoadmapPage() {
                     </CardTitle>
                     <CardDescription className="mt-1 flex items-center gap-3 flex-wrap">
                       {roadmap.estimated_duration && (
-                        <Badge variant="secondary" className="bg-indigo-50 text-indigo-600 border-indigo-100">
+                        <Badge variant="secondary" className="bg-neutral-100 text-neutral-700 border-neutral-200">
                           ⏱ {roadmap.estimated_duration}
                         </Badge>
                       )}
                       {roadmap.difficulty && (
-                        <Badge variant="secondary" className="bg-purple-50 text-purple-600 border-purple-100">
+                        <Badge variant="secondary" className="bg-neutral-100 text-neutral-700 border-neutral-200">
                           📊 {roadmap.difficulty}
                         </Badge>
                       )}
-                      <Badge variant="secondary" className="bg-gray-50 text-gray-600 border-gray-100">
+                      <Badge variant="secondary" className="bg-neutral-50 text-neutral-600 border-neutral-200">
                         {roadmap.steps.length} Phases
                       </Badge>
                     </CardDescription>
@@ -685,9 +685,9 @@ export default function RoadmapPage() {
               {/* Overall Progress */}
               <CardContent>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-linear-to-r from-indigo-500 to-purple-600 rounded-full"
+                      className="h-full bg-neutral-950 rounded-full"
                       initial={{ width: "0%" }}
                       animate={{ width: `${overallProgress}%` }}
                       transition={{ duration: 0.5 }}
@@ -718,7 +718,7 @@ export default function RoadmapPage() {
                   >
                     <Card
                       className={`border-0 shadow-lg transition-all duration-300 overflow-hidden ${
-                        isCompleted ? "bg-emerald-50/50 border-emerald-100" : "glass-card hover:shadow-xl"
+                        isCompleted ? "bg-neutral-50 border-neutral-200" : "glass-card hover:shadow-xl"
                       }`}
                     >
                       {/* Phase Header */}
@@ -731,10 +731,10 @@ export default function RoadmapPage() {
                           className="shrink-0"
                         >
                           <div
-                            className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
                               isCompleted
-                                ? "bg-emerald-100 text-emerald-600"
-                                : "bg-linear-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-200"
+                                ? "bg-neutral-100 text-neutral-700"
+                                : "bg-neutral-950 text-white shadow-sm"
                             }`}
                           >
                             {isCompleted ? (
@@ -747,11 +747,11 @@ export default function RoadmapPage() {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className={`text-lg font-bold ${isCompleted ? "text-emerald-700 line-through" : "text-gray-900"}`}>
+                            <h3 className={`text-lg font-bold ${isCompleted ? "text-neutral-600 line-through" : "text-gray-900"}`}>
                               {step.phase}
                             </h3>
                             {hasQuizResult && (
-                              <Badge className="bg-purple-50 text-purple-600 border-purple-200 text-[10px]">
+                              <Badge className="bg-neutral-100 text-neutral-700 border-neutral-200 text-[10px]">
                                 Quiz: {quizResults[index].score}/{quizResults[index].total}
                               </Badge>
                             )}
@@ -762,9 +762,9 @@ export default function RoadmapPage() {
                           {/* Topic progress mini bar */}
                           {phaseProgress > 0 && !isCompleted && (
                             <div className="flex items-center gap-2 mt-1.5">
-                              <div className="w-24 h-1 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="w-24 h-1 bg-neutral-100 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-indigo-400 rounded-full transition-all"
+                                  className="h-full bg-neutral-700 rounded-full transition-all"
                                   style={{ width: `${phaseProgress}%` }}
                                 />
                               </div>
@@ -790,7 +790,7 @@ export default function RoadmapPage() {
                           >
                             <div className="px-5 pb-5 pt-0 ml-14 space-y-4">
                               {/* Tab Switcher */}
-                              <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+                              <div className="flex gap-1 p-1 bg-neutral-100 rounded-xl w-fit">
                                 {(["topics", "resources", "quiz"] as const).map((t) => (
                                   <button
                                     key={t}
@@ -811,7 +811,7 @@ export default function RoadmapPage() {
                               {/* Topics / Checklist Tab */}
                               {tab === "topics" && (
                                 <div className="space-y-4">
-                                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                  <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200">
                                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
                                       Topics Checklist ({Object.values(topicChecklist[index] || {}).filter(Boolean).length}/{step.topics.length})
                                     </h4>
@@ -826,9 +826,9 @@ export default function RoadmapPage() {
                                           >
                                             <div className="mt-0.5 shrink-0">
                                               {checked ? (
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                                <CheckCircle2 className="w-4 h-4 text-neutral-700" />
                                               ) : (
-                                                <Circle className="w-4 h-4 text-gray-300 group-hover/topic:text-indigo-400 transition-colors" />
+                                                <Circle className="w-4 h-4 text-gray-300 group-hover/topic:text-neutral-700 transition-colors" />
                                               )}
                                             </div>
                                             <span className={`text-sm ${checked ? "text-gray-400 line-through" : "text-gray-700"}`}>
@@ -842,13 +842,13 @@ export default function RoadmapPage() {
 
                                   {/* Projects */}
                                   {step.projects && step.projects.length > 0 && (
-                                    <div className="p-4 rounded-xl bg-purple-50 border border-purple-100">
-                                      <h4 className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-3">
+                                    <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-200">
+                                      <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-3">
                                         🛠 Projects
                                       </h4>
                                       <ul className="space-y-1.5">
                                         {step.projects.map((project, pi) => (
-                                          <li key={pi} className="text-sm text-purple-700 font-medium">• {project}</li>
+                                          <li key={pi} className="text-sm text-neutral-700 font-medium">• {project}</li>
                                         ))}
                                       </ul>
                                     </div>
@@ -856,13 +856,13 @@ export default function RoadmapPage() {
 
                                   {/* Milestones */}
                                   {step.milestones && step.milestones.length > 0 && (
-                                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                                      <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3">
+                                    <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-200">
+                                      <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-700 mb-3">
                                         🎯 Milestones
                                       </h4>
                                       <ul className="space-y-1.5">
                                         {step.milestones.map((m, mi) => (
-                                          <li key={mi} className="text-sm text-emerald-700 font-medium">✓ {m}</li>
+                                          <li key={mi} className="text-sm text-neutral-700 font-medium">✓ {m}</li>
                                         ))}
                                       </ul>
                                     </div>
@@ -872,14 +872,14 @@ export default function RoadmapPage() {
 
                               {/* Resources Tab */}
                               {tab === "resources" && (
-                                <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200">
                                   <PhaseResourcesView phaseIndex={index} />
                                 </div>
                               )}
 
                               {/* Quiz Tab */}
                               {tab === "quiz" && (
-                                <div className="p-4 rounded-xl bg-purple-50/50 border border-purple-100">
+                                <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200">
                                   {loadingQuiz[index] ? (
                                     <div className="flex items-center gap-2 text-gray-500">
                                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -890,7 +890,7 @@ export default function RoadmapPage() {
                                       {quizResults[index] ? (
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-3">
-                                            <Trophy className={`w-5 h-5 ${quizResults[index].score >= 4 ? "text-emerald-500" : quizResults[index].score >= 3 ? "text-amber-500" : "text-red-500"}`} />
+                                            <Trophy className={`w-5 h-5 ${quizResults[index].score >= 4 ? "text-neutral-700" : quizResults[index].score >= 3 ? "text-neutral-700" : "text-red-500"}`} />
                                             <div>
                                               <p className="font-semibold text-gray-900">
                                                 Score: {quizResults[index].score}/{quizResults[index].total}
@@ -904,7 +904,7 @@ export default function RoadmapPage() {
                                             size="sm"
                                             variant="outline"
                                             onClick={() => setQuizModal(index)}
-                                            className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                                            className="text-neutral-700 border-neutral-200 hover:bg-neutral-100"
                                           >
                                             Review Answers
                                           </Button>
@@ -918,7 +918,7 @@ export default function RoadmapPage() {
                                           <Button
                                             size="sm"
                                             onClick={() => setQuizModal(index)}
-                                            className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                                            className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl"
                                           >
                                             <Brain className="w-4 h-4 mr-1" /> Take Quiz
                                           </Button>
@@ -943,7 +943,7 @@ export default function RoadmapPage() {
                           initial={{ height: 0 }}
                           animate={{ height: 16 }}
                           transition={{ duration: 0.3 }}
-                          className="w-0.5 bg-linear-to-b from-indigo-300 to-purple-300"
+                          className="w-0.5 bg-neutral-300"
                         />
                       </div>
                     )}
@@ -962,8 +962,8 @@ export default function RoadmapPage() {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center py-16 text-center"
         >
-          <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center mb-6">
-            <MapPin className="w-10 h-10 text-indigo-400" />
+          <div className="w-20 h-20 rounded-xl bg-neutral-100 flex items-center justify-center mb-6">
+            <MapPin className="w-10 h-10 text-neutral-700" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             {sourceType === null ? "No Roadmap Yet" : "Generate a Learning Roadmap"}
@@ -971,7 +971,7 @@ export default function RoadmapPage() {
           <p className="text-gray-400 max-w-md mb-4">
             Upload your resume first for a personalized roadmap, or search for any topic above to get started.
           </p>
-          <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl">
+          <Button asChild className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl">
             <Link href="/dashboard/resume">
               Upload Resume <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
