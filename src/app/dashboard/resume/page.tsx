@@ -26,6 +26,7 @@ import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import type { ParsedResume } from "@/lib/types";
 import Link from "next/link";
+import { UpgradeModal } from "@/components/billing/UpgradeModal";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -44,6 +45,8 @@ export default function ResumePage() {
     setParsing,
   } = useProfileStore();
 
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -188,6 +191,13 @@ export default function ResumePage() {
 
       const res = await fetch("/api/audit/start", { method: "POST", body: fd });
       const json = await res.json();
+      if (res.status === 402) {
+        setUpgradeReason(`You've used all ${json.data.limit} audit${json.data.limit === 1 ? "" : "s"} this month.`);
+        setUpgradeOpen(true);
+        setUploading(false);
+        setParsing(false);
+        return;
+      }
       if (!json.success) {
         setError(json.error || "Audit failed to start");
         setUploading(false);
@@ -649,6 +659,7 @@ export default function ResumePage() {
           </AnimatePresence>
         </motion.div>
       </div>
+      <UpgradeModal open={upgradeOpen} onOpenChange={setUpgradeOpen} reason={upgradeReason} />
     </div>
   );
 }
