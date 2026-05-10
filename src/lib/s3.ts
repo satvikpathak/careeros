@@ -53,3 +53,25 @@ export async function getPresignedUrl(key: string): Promise<string> {
 
   return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
+
+/**
+ * Download an object from S3 using IAM credentials. Works with private buckets.
+ * Accepts either a full https://...amazonaws.com/<key> URL or a bare key.
+ */
+export async function downloadFromS3(s3UrlOrKey: string): Promise<Buffer> {
+  const s3Client = getS3Client();
+  let key = s3UrlOrKey;
+  if (s3UrlOrKey.startsWith("http")) {
+    const u = new URL(s3UrlOrKey);
+    key = u.pathname.replace(/^\//, "");
+  }
+  const res = await s3Client.send(new GetObjectCommand({ Bucket: BUCKET, Key: key }));
+  if (!res.Body) throw new Error("S3 GetObject returned empty body");
+  // Body is a Readable; collect to Buffer
+  const chunks: Buffer[] = [];
+  const stream = res.Body as NodeJS.ReadableStream;
+  for await (const chunk of stream) {
+    chunks.push(chunk instanceof Buffer ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
