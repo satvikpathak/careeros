@@ -297,16 +297,6 @@ export default function DashboardPage() {
     }));
   }, [data]);
 
-  const marketTrends = [
-    { month: "Jan", revenue: 42, sessions: 35, conversion: 28 },
-    { month: "Feb", revenue: 55, sessions: 48, conversion: 35 },
-    { month: "Mar", revenue: 48, sessions: 42, conversion: 32 },
-    { month: "Apr", revenue: 72, sessions: 60, conversion: 45 },
-    { month: "May", revenue: 68, sessions: 55, conversion: 40 },
-    { month: "Jun", revenue: 85, sessions: 70, conversion: 52 },
-    { month: "Jul", revenue: 80, sessions: 65, conversion: 48 },
-  ];
-
   const topPerformers = useMemo(() => {
     if (!data?.audit?.skillMap) return [];
     const entries = Object.entries(data.audit.skillMap);
@@ -364,6 +354,15 @@ export default function DashboardPage() {
         sprint.tasks.length) *
       100
     : 0;
+
+  const auditTrend = data?.auditTrend || [];
+  const trendChartData = auditTrend.length > 0
+    ? auditTrend.map((p: any) => ({
+        month: new Date(p.date).toLocaleDateString("en", { month: "short", day: "numeric" }),
+        readiness: p.readiness,
+        market: p.marketMatch,
+      }))
+    : [{ month: "—", readiness: 0, market: 0 }];
 
   return (
     <motion.div
@@ -461,7 +460,7 @@ export default function DashboardPage() {
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={marketTrends}>
+                <AreaChart data={trendChartData}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#0A0A0A" stopOpacity={0.15} />
@@ -503,7 +502,7 @@ export default function DashboardPage() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="revenue"
+                    dataKey="readiness"
                     name="Readiness"
                     stroke="#0A0A0A"
                     strokeWidth={2.5}
@@ -512,21 +511,12 @@ export default function DashboardPage() {
                   />
                   <Area
                     type="monotone"
-                    dataKey="sessions"
-                    name="Skills"
+                    dataKey="market"
+                    name="Market"
                     stroke="#737373"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorSessions)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="conversion"
-                    name="Market"
-                    stroke="#A3A3A3"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorConversion)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -536,8 +526,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-6 mt-4 pt-4 border-t border-neutral-200">
               {[
                 { label: "Readiness", color: "#0A0A0A" },
-                { label: "Skills", color: "#737373" },
-                { label: "Market Fit", color: "#A3A3A3" },
+                { label: "Market Fit", color: "#737373" },
               ].map((l) => (
                 <div key={l.label} className="flex items-center gap-2">
                   <div
