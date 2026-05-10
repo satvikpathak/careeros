@@ -1,0 +1,22 @@
+import { NextResponse } from "next/server";
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
+export async function POST() {
+  const { auth } = await import("@clerk/nextjs/server");
+  const { userId: clerkId } = await auth();
+  if (!clerkId) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+
+  const { db } = await import("@/db");
+  const { users } = await import("@/db/schema");
+  const { eq } = await import("drizzle-orm");
+
+  await db.update(users)
+    .set({ onboardedAt: new Date() })
+    .where(eq(users.clerkId, clerkId));
+
+  return NextResponse.json({ success: true });
+}
