@@ -30,10 +30,10 @@ const fadeIn = {
 };
 
 const sourceColors: Record<string, string> = {
-  linkedin: "bg-blue-100 text-blue-700",
-  indeed: "bg-purple-100 text-purple-700",
-  naukri: "bg-emerald-100 text-emerald-700",
-  other: "bg-gray-100 text-gray-700",
+  linkedin: "bg-neutral-100 text-neutral-700 border border-neutral-200",
+  indeed:   "bg-neutral-100 text-neutral-700 border border-neutral-200",
+  naukri:   "bg-neutral-100 text-neutral-700 border border-neutral-200",
+  other:    "bg-neutral-100 text-neutral-700 border border-neutral-200",
 };
 
 export default function JobsPage() {
@@ -153,8 +153,8 @@ export default function JobsPage() {
 
       {apiStatusMessage && (
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="border border-amber-200 bg-amber-50">
-            <CardContent className="p-3 text-xs font-medium text-amber-800">
+          <Card className="border border-neutral-200 bg-neutral-100">
+            <CardContent className="p-3 text-xs font-medium text-neutral-700">
               {apiStatusMessage}
             </CardContent>
           </Card>
@@ -173,7 +173,7 @@ export default function JobsPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Job title, skills, or keywords..."
-                  className="pl-10 bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-indigo-200"
+                  className="pl-10 bg-neutral-50 border-0 focus-visible:ring-1 focus-visible:ring-neutral-200"
                 />
               </div>
               <div className="relative">
@@ -183,14 +183,14 @@ export default function JobsPage() {
                   onChange={(e) => setSearchLocation(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Location..."
-                  className="pl-10 bg-gray-50 border-0 focus-visible:ring-1 focus-visible:ring-indigo-200 w-full sm:w-48"
+                  className="pl-10 bg-neutral-50 border-0 focus-visible:ring-1 focus-visible:ring-neutral-200 w-full sm:w-48"
                 />
               </div>
               <div className="flex gap-2">
                 <Button
                   onClick={searchJobs}
                   disabled={isSearching || !searchQuery.trim()}
-                  className="bg-indigo-500 hover:bg-indigo-600 text-white border-0"
+                  className="bg-neutral-950 hover:bg-neutral-800 text-white border-0"
                 >
                   {isSearching ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -218,7 +218,7 @@ export default function JobsPage() {
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="pt-3 mt-3 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                  <div className="pt-3 mt-3 border-t border-neutral-200 flex flex-wrap items-center gap-2">
                     <span className="text-xs text-gray-400">Source:</span>
                     {(["all", "linkedin", "indeed", "naukri"] as const).map((source) => (
                       <button
@@ -226,8 +226,8 @@ export default function JobsPage() {
                         onClick={() => setSelectedSource(source)}
                         className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                           selectedSource === source
-                            ? "bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200"
-                            : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                            ? "bg-neutral-100 text-neutral-950 ring-1 ring-neutral-300"
+                            : "bg-neutral-50 text-gray-500 hover:bg-neutral-100"
                         }`}
                       >
                         {source.charAt(0).toUpperCase() + source.slice(1)}
@@ -255,7 +255,7 @@ export default function JobsPage() {
             {isMatching ? (
               <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
             ) : (
-              <Sparkles className="w-4 h-4 mr-1.5 text-indigo-500" />
+              <Sparkles className="w-4 h-4 mr-1.5 text-neutral-700" />
             )}
             {isMatching ? "Computing matches..." : "AI Match with Resume"}
           </Button>
@@ -300,7 +300,7 @@ export default function JobsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-neutral-950 transition-colors">
                               {job.title}
                             </h3>
                             <p className="text-sm text-gray-500">{job.company}</p>
@@ -314,7 +314,7 @@ export default function JobsPage() {
                                 {matchScores[job.id]}% match
                               </Badge>
                             )}
-                            <Badge className={`text-[10px] ${sourceColors[job.source]}`}>
+                            <Badge className={`text-[10px] ${sourceColors[job.source] || sourceColors.other}`}>
                               {job.source}
                             </Badge>
                           </div>
