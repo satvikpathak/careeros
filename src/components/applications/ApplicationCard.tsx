@@ -25,8 +25,12 @@ export function ApplicationCard({ app }: ApplicationCardProps) {
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const updated = app.updatedAt ? new Date(app.updatedAt) : null;
-  const ageDays = updated ? Math.floor((Date.now() - updated.getTime()) / (24 * 60 * 60 * 1000)) : null;
+  const [ageDays, setAgeDays] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!app.updatedAt) { setAgeDays(null); return; }
+    const updated = new Date(app.updatedAt);
+    setAgeDays(Math.floor((Date.now() - updated.getTime()) / (24 * 60 * 60 * 1000)));
+  }, [app.updatedAt]);
 
   return (
     <div
