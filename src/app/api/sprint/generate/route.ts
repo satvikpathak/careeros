@@ -5,6 +5,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAI, SPRINT_GENERATOR_PROMPT } from "@/lib/gemini";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { audit, targetRole, weekNumber } = await req.json();

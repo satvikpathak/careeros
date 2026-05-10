@@ -89,7 +89,7 @@ function sanitizeResources(data: any) {
 
 export default function ResourcesPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-indigo-400 animate-spin" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-neutral-400 animate-spin" /></div>}>
       <ResourcesContent />
     </Suspense>
   );
@@ -165,7 +165,7 @@ function ResourcesContent() {
       <motion.div initial="hidden" animate="visible" variants={fadeIn}>
         <Badge
           variant="secondary"
-          className="mb-2 px-3 py-1 bg-indigo-50 text-indigo-600 border-indigo-100 flex items-center gap-1.5 w-fit"
+          className="mb-2 px-3 py-1 bg-neutral-100 text-neutral-700 border-neutral-200 flex items-center gap-1.5 w-fit"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" /> AI-Curated Resources
         </Badge>
@@ -187,13 +187,13 @@ function ResourcesContent() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search for any topic (e.g., React, Machine Learning, System Design)"
-              className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white border border-gray-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900 placeholder-gray-400 font-medium transition-all"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-neutral-200 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100 outline-none text-gray-900 placeholder-gray-400 font-medium transition-all"
             />
           </div>
           <Button
             type="submit"
             disabled={loading || !query.trim()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl px-8 shadow-lg shadow-indigo-100 disabled:opacity-50"
+            className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl px-8 shadow-sm disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -220,7 +220,7 @@ function ResourcesContent() {
                       setQuery(skill);
                       searchResources(skill);
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 text-sm font-medium transition-colors border border-rose-100"
+                    className="px-3 py-1.5 rounded-xl bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-sm font-medium transition-colors border border-neutral-200"
                   >
                     + {skill}
                   </button>
@@ -241,7 +241,7 @@ function ResourcesContent() {
                     setQuery(topic);
                     searchResources(topic);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-sm font-medium transition-colors border border-indigo-100"
+                  className="px-3 py-1.5 rounded-xl bg-neutral-100 text-neutral-700 hover:bg-neutral-200 text-sm font-medium transition-colors border border-neutral-200"
                 >
                   {topic}
                 </button>
@@ -254,7 +254,7 @@ function ResourcesContent() {
       {/* Loading State */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+          <Loader2 className="w-12 h-12 text-neutral-400 animate-spin mb-4" />
           <p className="text-gray-500 font-medium animate-pulse">
             Curating the best resources for you...
           </p>
@@ -308,8 +308,8 @@ function ResourcesContent() {
 
             {/* Resource Stats */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-red-50 border border-red-100">
-                <Youtube className="w-5 h-5 text-red-500" />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-100 border border-neutral-200">
+                <Youtube className="w-5 h-5 text-neutral-700" />
                 <div>
                   <p className="text-lg font-bold text-gray-900">
                     {resources.youtube_playlists?.length || 0}
@@ -319,8 +319,8 @@ function ResourcesContent() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
-                <BookOpen className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-100 border border-neutral-200">
+                <BookOpen className="w-5 h-5 text-neutral-700" />
                 <div>
                   <p className="text-lg font-bold text-gray-900">
                     {resources.courses?.length || 0}
@@ -330,8 +330,8 @@ function ResourcesContent() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                <FileText className="w-5 h-5 text-emerald-500" />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-neutral-100 border border-neutral-200">
+                <FileText className="w-5 h-5 text-neutral-700" />
                 <div>
                   <p className="text-lg font-bold text-gray-900">
                     {resources.blogs?.length || 0}
@@ -369,8 +369,8 @@ function ResourcesContent() {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center py-16 text-center"
         >
-          <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center mb-6">
-            <Search className="w-10 h-10 text-indigo-400" />
+          <div className="w-20 h-20 rounded-xl bg-neutral-100 flex items-center justify-center mb-6">
+            <Search className="w-10 h-10 text-neutral-700" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             Search for any topic

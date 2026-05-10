@@ -2,8 +2,18 @@ import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
-      <SignUp routing="path" path="/sign-up" />
+    <div className="bg-neutral-50 min-h-screen flex items-center justify-center">
+      <SignUp
+        routing="path"
+        path="/sign-up"
+        appearance={{
+          elements: {
+            card: "shadow-sm border border-neutral-200",
+            formButtonPrimary: "bg-neutral-950 hover:bg-neutral-800 text-white",
+            footerActionLink: "text-neutral-950 hover:underline",
+          },
+        }}
+      />
     </div>
   );
 }

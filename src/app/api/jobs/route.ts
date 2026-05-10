@@ -5,6 +5,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { NormalizedJob } from "@/lib/types";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "";
 const RAPIDAPI_HOST_JSEARCH = "jsearch.p.rapidapi.com";
 

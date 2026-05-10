@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { auth } = await import("@clerk/nextjs/server");

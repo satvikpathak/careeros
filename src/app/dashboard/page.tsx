@@ -57,6 +57,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { useRoadmapStore } from "@/stores/roadmap-store";
+import { StatCard } from "@/components/ui/stat-card";
+import { SectionHeader } from "@/components/ui/section-header";
+import { EmptyState } from "@/components/ui/empty-state";
 
 /* ============================================ */
 /* Animation Variants                           */
@@ -142,101 +145,6 @@ function AnimatedCounter({
 }
 
 /* ============================================ */
-/* KPI Card Component                           */
-/* ============================================ */
-
-interface KPICardProps {
-  title: string;
-  value: number;
-  suffix?: string;
-  prefix?: string;
-  decimals?: number;
-  change: number;
-  changeLabel: string;
-  icon: React.ElementType;
-  iconColor: string;
-  iconBg: string;
-  index: number;
-}
-
-function KPICard({
-  title,
-  value,
-  suffix = "",
-  prefix = "",
-  decimals = 0,
-  change,
-  changeLabel,
-  icon: Icon,
-  iconColor,
-  iconBg,
-  index,
-}: KPICardProps) {
-  const isPositive = change >= 0;
-
-  return (
-    <motion.div
-      variants={fadeUp}
-      whileHover={{
-        y: -4,
-        boxShadow: "0 20px 40px -12px rgba(0,0,0,0.08)",
-        transition: { duration: 0.2 },
-      }}
-      className="bg-white rounded-[24px] border border-gray-100 p-6 relative overflow-hidden group cursor-default"
-      style={{
-        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-      }}
-    >
-      {/* Subtle shimmer on hover */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-      />
-
-      <div className="flex items-start justify-between mb-4">
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          transition={{ type: "spring", stiffness: 400 }}
-          className={`w-12 h-12 rounded-2xl flex items-center justify-center ${iconBg}`}
-        >
-          <Icon className={`w-5 h-5 ${iconColor}`} />
-        </motion.div>
-
-        <div
-          className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold ${
-            isPositive
-              ? "bg-emerald-50 text-emerald-600"
-              : "bg-rose-50 text-rose-600"
-          }`}
-        >
-          {isPositive ? (
-            <TrendingUp className="w-3 h-3" />
-          ) : (
-            <TrendingDown className="w-3 h-3" />
-          )}
-          {isPositive ? "+" : ""}
-          {change}%
-        </div>
-      </div>
-
-      <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-[0.1em] mb-1">
-        {title}
-      </p>
-
-      <p className="text-3xl font-extrabold text-[#020617] tracking-tight leading-none">
-        <AnimatedCounter
-          value={value}
-          suffix={suffix}
-          prefix={prefix}
-          decimals={decimals}
-        />
-      </p>
-
-      <p className="text-[11px] text-[#9CA3AF] mt-2 font-medium">{changeLabel}</p>
-    </motion.div>
-  );
-}
-
-/* ============================================ */
 /* Live Activity Item                           */
 /* ============================================ */
 
@@ -255,7 +163,7 @@ function LiveActivityCard({ item, index }: { item: ActivityItem; index: number }
     <motion.div
       variants={slideRight}
       whileHover={{ x: -4, transition: { duration: 0.15 } }}
-      className="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50/50 transition-colors cursor-default group"
+      className="flex items-start gap-3 p-3 rounded-2xl hover:bg-neutral-50 transition-colors cursor-default group"
     >
       <motion.div
         whileHover={{ scale: 1.15 }}
@@ -264,12 +172,12 @@ function LiveActivityCard({ item, index }: { item: ActivityItem; index: number }
         <item.icon className={`w-4 h-4 ${item.iconColor}`} />
       </motion.div>
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-semibold text-[#020617] leading-tight truncate">
+        <p className="text-[13px] font-semibold text-neutral-950 leading-tight truncate">
           {item.title}
         </p>
-        <p className="text-[11px] text-[#9CA3AF] mt-0.5 truncate">{item.description}</p>
+        <p className="text-[11px] text-neutral-400 mt-0.5 truncate">{item.description}</p>
       </div>
-      <span className="text-[10px] font-medium text-[#9CA3AF] whitespace-nowrap mt-0.5">
+      <span className="text-[10px] font-medium text-neutral-400 whitespace-nowrap mt-0.5">
         {item.time}
       </span>
     </motion.div>
@@ -297,13 +205,13 @@ function TabButton({
       {active && (
         <motion.div
           layoutId="tab-indicator"
-          className="absolute inset-0 bg-[#020617] rounded-xl"
+          className="absolute inset-0 bg-neutral-950 rounded-xl"
           transition={{ type: "spring", stiffness: 500, damping: 35 }}
         />
       )}
       <span
         className={`relative z-10 ${
-          active ? "text-white" : "text-[#9CA3AF] hover:text-[#4B5563]"
+          active ? "text-white" : "text-neutral-400 hover:text-neutral-600"
         }`}
       >
         {children}
@@ -411,35 +319,23 @@ export default function DashboardPage() {
       }));
   }, [data]);
 
-  const barColors = ["#005BB7", "#020617", "#06B6D4", "#F59E0B", "#10B981"];
+  const barColors = ["#0A0A0A", "#262626", "#525252", "#737373", "#A3A3A3"];
 
   const liveActivities: ActivityItem[] = [
-    { id: "1", icon: Target, iconColor: "text-[#005BB7]", iconBg: "bg-blue-50", title: "Readiness Score Updated", description: "Your career readiness increased", time: "2m ago" },
-    { id: "2", icon: CheckCircle2, iconColor: "text-emerald-500", iconBg: "bg-emerald-50", title: "Sprint Task Completed", description: "Finished weekly learning goal", time: "15m ago" },
-    { id: "3", icon: Star, iconColor: "text-amber-500", iconBg: "bg-amber-50", title: "New Skill Unlocked", description: "Added to your profile", time: "1h ago" },
-    { id: "4", icon: Flame, iconColor: "text-rose-500", iconBg: "bg-rose-50", title: "Streak Extended!", description: "Keep the momentum going", time: "2h ago" },
-    { id: "5", icon: Eye, iconColor: "text-cyan-500", iconBg: "bg-cyan-50", title: "Profile Viewed", description: "Recruiter viewed your profile", time: "3h ago" },
-    { id: "6", icon: ArrowUpRight, iconColor: "text-gray-900", iconBg: "bg-gray-100", title: "Market Demand Up", description: "Your target role trending +12%", time: "5h ago" },
+    { id: "1", icon: Target, iconColor: "text-neutral-950", iconBg: "bg-neutral-100", title: "Readiness Score Updated", description: "Your career readiness increased", time: "2m ago" },
+    { id: "2", icon: CheckCircle2, iconColor: "text-neutral-700", iconBg: "bg-neutral-100", title: "Sprint Task Completed", description: "Finished weekly learning goal", time: "15m ago" },
+    { id: "3", icon: Star, iconColor: "text-neutral-700", iconBg: "bg-neutral-100", title: "New Skill Unlocked", description: "Added to your profile", time: "1h ago" },
+    { id: "4", icon: Flame, iconColor: "text-neutral-700", iconBg: "bg-neutral-100", title: "Streak Extended!", description: "Keep the momentum going", time: "2h ago" },
+    { id: "5", icon: Eye, iconColor: "text-neutral-700", iconBg: "bg-neutral-100", title: "Profile Viewed", description: "Recruiter viewed your profile", time: "3h ago" },
+    { id: "6", icon: ArrowUpRight, iconColor: "text-gray-900", iconBg: "bg-neutral-100", title: "Market Demand Up", description: "Your target role trending +12%", time: "5h ago" },
   ];
 
   /* ============= LOADING STATE ============= */
   if (loading) {
     return (
-      <div className="h-[80vh] flex flex-col items-center justify-center space-y-4">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        >
-          <Loader2 className="w-10 h-10 text-[#005BB7]" />
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-[#9CA3AF] font-medium text-sm"
-        >
-          Loading your career intelligence...
-        </motion.p>
+      <div className="flex h-[80vh] flex-col items-center justify-center gap-3">
+        <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+        <p className="text-sm text-neutral-500">Loading your career intelligence...</p>
       </div>
     );
   }
@@ -447,36 +343,18 @@ export default function DashboardPage() {
   /* ============= NO AUDIT STATE ============= */
   if (!data?.audit) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="h-[80vh] flex flex-col items-center justify-center text-center px-4"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 400, delay: 0.2 }}
-          className="w-20 h-20 rounded-3xl bg-blue-50 flex items-center justify-center mb-6"
-        >
-          <FileText className="w-10 h-10 text-[#005BB7]" />
-        </motion.div>
-        <h2 className="text-3xl font-extrabold text-[#020617] mb-3">
-          No Career Audit Found
-        </h2>
-        <p className="text-[#9CA3AF] max-w-md mb-8 text-sm leading-relaxed">
-          Upload your resume to generate your Career Intelligence Audit and
-          unlock your personalized weekly sprints.
-        </p>
-        <Button
-          asChild
-          className="bg-[#005BB7] hover:bg-[#004B99] text-white rounded-2xl px-10 py-3 shadow-xl shadow-blue-200/50 font-bold"
-        >
-          <Link href="/dashboard/resume">
-            Start Your Audit{" "}
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Link>
-        </Button>
-      </motion.div>
+      <EmptyState
+        icon={FileText}
+        title="No career audit yet"
+        description="Upload your resume to generate your Career Intelligence Audit and unlock weekly sprints."
+        action={
+          <Button asChild>
+            <Link href="/dashboard/resume">
+              Start your audit <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
+        }
+      />
     );
   }
 
@@ -495,100 +373,51 @@ export default function DashboardPage() {
       className="space-y-6 pb-10 max-w-[1400px] mx-auto"
     >
       {/* ==================== HEADER ==================== */}
-      <motion.div
-        variants={fadeUp}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
-      >
-        <div>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#005BB7] rounded-lg text-[11px] font-bold uppercase tracking-[0.1em] mb-3"
-          >
-            <Zap className="w-3 h-3 fill-current" /> CareerOS 2.0 Active
-          </motion.div>
-          <h1 className="text-3xl font-extrabold text-[#020617] tracking-tight leading-none">
-            Welcome back,{" "}
-            <span className="bg-gradient-to-r from-[#005BB7] to-[#020617] bg-clip-text text-transparent">
-              {user.name?.split(" ")[0] || "Developer"}
+      <SectionHeader
+        eyebrow="CareerOS"
+        title={`Welcome back, ${user.name?.split(" ")[0] || "Developer"}`}
+        description="Your career intelligence overview."
+        actions={
+          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5">
+            <Trophy className="h-3.5 w-3.5 text-neutral-700" />
+            <span className="text-[12px] font-semibold text-neutral-950">
+              <AnimatedCounter value={user.streak || 0} suffix=" day streak" />
             </span>
-          </h1>
-          <p className="text-[#9CA3AF] mt-2 text-sm font-medium">
-            Your career intelligence dashboard is ready. Here&apos;s your overview.
-          </p>
-        </div>
-
-        <motion.div
-          variants={scaleIn}
-          whileHover={{ y: -2 }}
-          className="bg-white rounded-2xl px-5 py-3 flex items-center gap-4 border border-gray-100 shadow-sm"
-        >
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.15em] text-[#9CA3AF] font-bold">
-              Current Streak
-            </p>
-            <p className="text-xl font-extrabold text-[#020617]">
-              <AnimatedCounter value={user.streak || 0} suffix=" Days" />
-            </p>
           </div>
-          <motion.div
-            whileHover={{ rotate: 15, scale: 1.1 }}
-            className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-200/50"
-          >
-            <Trophy className="w-5 h-5 text-white" />
-          </motion.div>
-        </motion.div>
-      </motion.div>
+        }
+      />
 
       {/* ==================== KPI CARDS ==================== */}
       <motion.div
         variants={staggerContainer}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        <KPICard
-          title="Readiness Score"
-          value={audit.readinessScore || 0}
-          suffix="%"
-          change={12.5}
-          changeLabel="vs last assessment"
+        <StatCard
+          label="Readiness Score"
+          value={`${audit.readinessScore || 0}%`}
+          delta={{ value: 12.5, label: "vs last assessment" }}
           icon={Target}
-          iconColor="text-[#005BB7]"
-          iconBg="bg-blue-50"
-          index={0}
         />
-        <KPICard
-          title="Market Match"
-          value={audit.marketMatchScore || 0}
-          suffix="%"
-          change={8.2}
-          changeLabel="role alignment score"
+        <StatCard
+          label="Market Match"
+          value={`${audit.marketMatchScore || 0}%`}
+          delta={{ value: 8.2, label: "role alignment score" }}
           icon={TrendingUp}
-          iconColor="text-emerald-500"
-          iconBg="bg-emerald-50"
-          index={1}
         />
-        <KPICard
-          title="Sprint Progress"
-          value={Math.round(completionRate)}
-          suffix="%"
-          change={completionRate > 50 ? 15.3 : -5.2}
-          changeLabel={sprint ? `Week #${sprint.weekNumber}` : "No active sprint"}
+        <StatCard
+          label="Sprint Progress"
+          value={`${Math.round(completionRate)}%`}
+          delta={{
+            value: completionRate > 50 ? 15.3 : -5.2,
+            label: sprint ? `Week #${sprint.weekNumber}` : "No active sprint",
+          }}
           icon={Zap}
-          iconColor="text-amber-500"
-          iconBg="bg-amber-50"
-          index={2}
         />
-        <KPICard
-          title="Project Quality"
-          value={audit.projectQualityScore || 0}
-          suffix="%"
-          change={6.7}
-          changeLabel="portfolio strength"
+        <StatCard
+          label="Project Quality"
+          value={`${audit.projectQualityScore || 0}%`}
+          delta={{ value: 6.7, label: "portfolio strength" }}
           icon={BarChart3}
-          iconColor="text-gray-900"
-          iconBg="bg-gray-100"
-          index={3}
         />
       </motion.div>
 
@@ -601,23 +430,23 @@ export default function DashboardPage() {
           <motion.div
             variants={fadeUp}
             whileHover={{ boxShadow: "0 12px 40px -8px rgba(0,0,0,0.08)" }}
-            className="bg-white rounded-[24px] border border-gray-100 p-6 transition-shadow"
+            className="bg-white rounded-xl border border-neutral-200 p-6 transition-shadow"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-bold text-[#020617]">
+                <h3 className="text-lg font-bold text-neutral-950">
                   Performance Trends
                 </h3>
-                <p className="text-[12px] text-[#9CA3AF] mt-0.5 font-medium">
+                <p className="text-[12px] text-neutral-400 mt-0.5 font-medium">
                   Your career metrics over time
                 </p>
               </div>
-              <div className="flex bg-gray-50 rounded-xl p-1">
+              <div className="flex bg-neutral-50 rounded-xl p-1">
                 {["7d", "30d", "90d"].map((range) => (
                   <button
                     key={range}
-                    className="px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all text-[#9CA3AF] hover:text-[#4B5563] first:bg-white first:text-[#020617] first:shadow-sm"
+                    className="px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all text-neutral-400 hover:text-neutral-600 first:bg-white first:text-neutral-950 first:shadow-sm"
                   >
                     {range}
                   </button>
@@ -635,16 +464,16 @@ export default function DashboardPage() {
                 <AreaChart data={marketTrends}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#020617" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#020617" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#0A0A0A" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#0A0A0A" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#737373" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#737373" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorConversion" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#A3A3A3" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#A3A3A3" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -656,12 +485,12 @@ export default function DashboardPage() {
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: "#9CA3AF", fontWeight: 500 }}
+                    tick={{ fontSize: 11, fill: "#A3A3A3", fontWeight: 500 }}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: "#9CA3AF", fontWeight: 500 }}
+                    tick={{ fontSize: 11, fill: "#A3A3A3", fontWeight: 500 }}
                   />
                   <Tooltip
                     contentStyle={{
@@ -676,7 +505,7 @@ export default function DashboardPage() {
                     type="monotone"
                     dataKey="revenue"
                     name="Readiness"
-                    stroke="#020617"
+                    stroke="#0A0A0A"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorRevenue)"
@@ -685,7 +514,7 @@ export default function DashboardPage() {
                     type="monotone"
                     dataKey="sessions"
                     name="Skills"
-                    stroke="#06B6D4"
+                    stroke="#737373"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorSessions)"
@@ -694,7 +523,7 @@ export default function DashboardPage() {
                     type="monotone"
                     dataKey="conversion"
                     name="Market"
-                    stroke="#F59E0B"
+                    stroke="#A3A3A3"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#colorConversion)"
@@ -704,18 +533,18 @@ export default function DashboardPage() {
             </motion.div>
 
             {/* Legend */}
-            <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-50">
+            <div className="flex items-center gap-6 mt-4 pt-4 border-t border-neutral-200">
               {[
-                { label: "Readiness", color: "#020617" },
-                { label: "Skills", color: "#06B6D4" },
-                { label: "Market Fit", color: "#F59E0B" },
+                { label: "Readiness", color: "#0A0A0A" },
+                { label: "Skills", color: "#737373" },
+                { label: "Market Fit", color: "#A3A3A3" },
               ].map((l) => (
                 <div key={l.label} className="flex items-center gap-2">
                   <div
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: l.color }}
                   />
-                  <span className="text-[11px] font-semibold text-[#9CA3AF]">
+                  <span className="text-[11px] font-semibold text-neutral-400">
                     {l.label}
                   </span>
                 </div>
@@ -729,13 +558,13 @@ export default function DashboardPage() {
             <motion.div
               variants={fadeUp}
               whileHover={{ boxShadow: "0 12px 40px -8px rgba(0,0,0,0.08)" }}
-              className="bg-white rounded-[24px] border border-gray-100 p-6"
+              className="bg-white rounded-xl border border-neutral-200 p-6"
               style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
             >
-              <h3 className="text-lg font-bold text-[#020617] mb-1">
+              <h3 className="text-lg font-bold text-neutral-950 mb-1">
                 Top Skills
               </h3>
-              <p className="text-[12px] text-[#9CA3AF] font-medium mb-5">
+              <p className="text-[12px] text-neutral-400 font-medium mb-5">
                 Your strongest competencies
               </p>
 
@@ -748,10 +577,10 @@ export default function DashboardPage() {
                     transition={{ delay: 0.5 + i * 0.1 }}
                     className="flex items-center gap-3"
                   >
-                    <span className="text-[12px] font-semibold text-[#4B5563] w-28 truncate">
+                    <span className="text-[12px] font-semibold text-neutral-600 w-28 truncate">
                       {perf.name}
                     </span>
-                    <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${perf.score}%` }}
@@ -766,7 +595,7 @@ export default function DashboardPage() {
                         }}
                       />
                     </div>
-                    <span className="text-[12px] font-bold text-[#020617] w-8 text-right">
+                    <span className="text-[12px] font-bold text-neutral-950 w-8 text-right">
                       {perf.score}
                     </span>
                   </motion.div>
@@ -778,13 +607,13 @@ export default function DashboardPage() {
             <motion.div
               variants={fadeUp}
               whileHover={{ boxShadow: "0 12px 40px -8px rgba(0,0,0,0.08)" }}
-              className="bg-white rounded-[24px] border border-gray-100 p-6"
+              className="bg-white rounded-xl border border-neutral-200 p-6"
               style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
             >
-              <h3 className="text-lg font-bold text-[#020617] mb-1">
+              <h3 className="text-lg font-bold text-neutral-950 mb-1">
                 Skill Radar
               </h3>
-              <p className="text-[12px] text-[#9CA3AF] font-medium mb-2">
+              <p className="text-[12px] text-neutral-400 font-medium mb-2">
                 Competency distribution
               </p>
 
@@ -799,13 +628,13 @@ export default function DashboardPage() {
                     <PolarGrid stroke="#e2e8f0" />
                     <PolarAngleAxis
                       dataKey="subject"
-                      tick={{ fontSize: 10, fontWeight: 600, fill: "#9CA3AF" }}
+                      tick={{ fontSize: 10, fontWeight: 600, fill: "#A3A3A3" }}
                     />
                     <Radar
                       name="Skills"
                       dataKey="A"
-                      stroke="#005BB7"
-                      fill="#005BB7"
+                      stroke="#0A0A0A"
+                      fill="#0A0A0A"
                       fillOpacity={0.15}
                       strokeWidth={2}
                     />
@@ -818,30 +647,30 @@ export default function DashboardPage() {
           {/* === Weekly Sprint === */}
           <motion.div
             variants={fadeUp}
-            className="bg-white rounded-[24px] border border-gray-100 overflow-hidden"
+            className="bg-white rounded-xl border border-neutral-200 overflow-hidden"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             {/* Sprint header with tabs */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-[#020617]">
+                <h3 className="text-lg font-bold text-neutral-950">
                   {sprint ? `Week #${sprint.weekNumber} Sprint` : "Weekly Sprint"}
                 </h3>
-                <p className="text-[12px] text-[#9CA3AF] font-medium mt-0.5">
+                <p className="text-[12px] text-neutral-400 font-medium mt-0.5">
                   AI-generated execution plan
                 </p>
               </div>
               {sprint && (
                 <div className="flex items-center gap-3">
-                  <span className="text-[12px] font-bold text-[#005BB7]">
+                  <span className="text-[12px] font-bold text-neutral-950">
                     {Math.round(completionRate)}%
                   </span>
-                  <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${completionRate}%` }}
                       transition={{ duration: 1.2, delay: 0.5 }}
-                      className="h-full bg-[#005BB7] rounded-full"
+                      className="h-full bg-neutral-950 rounded-full"
                     />
                   </div>
                 </div>
@@ -854,13 +683,13 @@ export default function DashboardPage() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.3 }}
-                  className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 rounded-2xl bg-neutral-100 flex items-center justify-center mx-auto mb-4"
                 >
-                  <Zap className="w-8 h-8 text-[#005BB7]" />
+                  <Zap className="w-8 h-8 text-neutral-950" />
                 </motion.div>
-                <h4 className="text-lg font-bold text-[#020617]">No Active Sprint</h4>
-                <p className="text-sm text-[#9CA3AF] mb-6">Your next weekly plan is ready to be generated.</p>
-                <Button className="bg-[#005BB7] hover:bg-[#004B99] text-white rounded-xl shadow-lg shadow-blue-200/30 font-bold">
+                <h4 className="text-lg font-bold text-neutral-950">No Active Sprint</h4>
+                <p className="text-sm text-neutral-400 mb-6">Your next weekly plan is ready to be generated.</p>
+                <Button className="bg-neutral-950 hover:bg-neutral-800 text-white rounded-xl shadow-lg font-bold">
                   Generate Sprint
                 </Button>
               </div>
@@ -884,8 +713,8 @@ export default function DashboardPage() {
                         whileTap={{ scale: 0.85 }}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all duration-300 ${
                           task.completed
-                            ? "bg-emerald-50 text-emerald-500"
-                            : "bg-gray-50 text-[#9CA3AF] group-hover:bg-blue-50 group-hover:text-[#005BB7]"
+                            ? "bg-neutral-100 text-neutral-700"
+                            : "bg-neutral-50 text-neutral-400 group-hover:bg-neutral-100 group-hover:text-neutral-950"
                         }`}
                       >
                         {task.completed ? (
@@ -904,21 +733,21 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2 mb-0.5">
                           <span
                             className={`text-[10px] uppercase font-bold tracking-[0.1em] ${
-                              task.completed ? "text-emerald-400" : "text-[#005BB7]/60"
+                              task.completed ? "text-neutral-400" : "text-neutral-950/60"
                             }`}
                           >
                             {task.type}
                           </span>
                           <span className="text-gray-200">•</span>
-                          <span className="text-[10px] font-semibold text-[#9CA3AF]">
+                          <span className="text-[10px] font-semibold text-neutral-400">
                             {task.time_estimate || "2h"}
                           </span>
                         </div>
                         <p
                           className={`font-semibold text-[14px] leading-tight ${
                             task.completed
-                              ? "text-[#9CA3AF] line-through"
-                              : "text-[#020617] group-hover:text-[#005BB7]"
+                              ? "text-neutral-400 line-through"
+                              : "text-neutral-950 group-hover:text-neutral-950"
                           }`}
                         >
                           {task.description}
@@ -928,21 +757,21 @@ export default function DashboardPage() {
                         className={`w-4 h-4 transition-all duration-200 ${
                           task.completed
                             ? "opacity-0"
-                            : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1 text-[#005BB7]"
+                            : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1 text-neutral-950"
                         }`}
                       />
                     </motion.div>
                   ))}
                 </div>
-                <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-50 flex justify-between items-center">
-                  <p className="text-[12px] text-[#9CA3AF] font-medium">
-                    Tasks refresh every <span className="text-[#005BB7] font-bold">Monday</span>
+                <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex justify-between items-center">
+                  <p className="text-[12px] text-neutral-400 font-medium">
+                    Tasks refresh every <span className="text-neutral-950 font-bold">Monday</span>
                   </p>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={fetchDashboardData}
-                    className="flex items-center gap-2 text-[12px] font-bold text-[#9CA3AF] hover:text-[#005BB7] transition-colors"
+                    className="flex items-center gap-2 text-[12px] font-bold text-neutral-400 hover:text-neutral-950 transition-colors"
                   >
                     <RefreshCw className="w-3.5 h-3.5" /> Refresh
                   </motion.button>
@@ -954,24 +783,24 @@ export default function DashboardPage() {
           {/* === AI Intelligence Feed === */}
           <motion.div variants={fadeUp} className="space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#005BB7]" />
-              <h3 className="text-lg font-bold text-[#020617]">AI Insights</h3>
+              <Sparkles className="w-4 h-4 text-neutral-950" />
+              <h3 className="text-lg font-bold text-neutral-950">AI Insights</h3>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <motion.div
-                whileHover={{ y: -3, boxShadow: "0 12px 30px -8px rgba(245,158,11,0.15)" }}
-                className="bg-white rounded-[20px] border border-gray-100 p-5 flex items-start gap-4 relative overflow-hidden"
+                whileHover={{ y: -3, boxShadow: "0 12px 30px -8px rgba(0,0,0,0.08)" }}
+                className="bg-white rounded-lg border border-neutral-200 p-5 flex items-start gap-4 relative overflow-hidden"
                 style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
               >
-                <div className="absolute top-0 left-0 w-1 h-full bg-amber-400 rounded-r" />
-                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-5 h-5 text-amber-500" />
+                <div className="absolute top-0 left-0 w-1 h-full bg-neutral-400 rounded-r" />
+                <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-neutral-700" />
                 </div>
                 <div>
-                  <p className="font-bold text-[#020617] text-[14px]">
+                  <p className="font-bold text-neutral-950 text-[14px]">
                     Skill Vulnerability
                   </p>
-                  <p className="text-[12px] text-[#9CA3AF] mt-1 leading-relaxed">
+                  <p className="text-[12px] text-neutral-400 mt-1 leading-relaxed">
                     {audit.atsKeywordAnalysis?.skill_gaps?.[0]
                       ? `Your lack of ${audit.atsKeywordAnalysis.skill_gaps[0]} is a risk factor.`
                       : "Analyzing skill vulnerabilities..."}
@@ -980,19 +809,19 @@ export default function DashboardPage() {
               </motion.div>
 
               <motion.div
-                whileHover={{ y: -3, boxShadow: "0 12px 30px -8px rgba(0,91,183,0.15)" }}
-                className="bg-white rounded-[20px] border border-gray-100 p-5 flex items-start gap-4 relative overflow-hidden"
+                whileHover={{ y: -3, boxShadow: "0 12px 30px -8px rgba(0,0,0,0.08)" }}
+                className="bg-white rounded-lg border border-neutral-200 p-5 flex items-start gap-4 relative overflow-hidden"
                 style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
               >
-                <div className="absolute top-0 left-0 w-1 h-full bg-[#005BB7] rounded-r" />
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <Lightbulb className="w-5 h-5 text-[#005BB7]" />
+                <div className="absolute top-0 left-0 w-1 h-full bg-neutral-950 rounded-r" />
+                <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-5 h-5 text-neutral-950" />
                 </div>
                 <div>
-                  <p className="font-bold text-[#020617] text-[14px]">
+                  <p className="font-bold text-neutral-950 text-[14px]">
                     Market Opportunity
                   </p>
-                  <p className="text-[12px] text-[#9CA3AF] mt-1 leading-relaxed">
+                  <p className="text-[12px] text-neutral-400 mt-1 leading-relaxed">
                     {audit.atsKeywordAnalysis?.market_alignment ||
                       "Analyzing market opportunities based on your profile..."}
                   </p>
@@ -1007,26 +836,26 @@ export default function DashboardPage() {
               <motion.div
                 whileHover={{
                   y: -3,
-                  boxShadow: "0 12px 30px -8px rgba(0,91,183,0.1)",
+                  boxShadow: "0 12px 30px -8px rgba(0,0,0,0.08)",
                 }}
-                className="bg-white rounded-[20px] border border-gray-100 p-5 flex items-center gap-4 cursor-pointer group"
+                className="bg-white rounded-lg border border-neutral-200 p-5 flex items-center gap-4 cursor-pointer group"
                 style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center"
+                  className="w-11 h-11 rounded-xl bg-neutral-100 flex items-center justify-center"
                 >
-                  <BookOpen className="w-5 h-5 text-[#005BB7]" />
+                  <BookOpen className="w-5 h-5 text-neutral-950" />
                 </motion.div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-[#020617] text-[14px] group-hover:text-[#005BB7] transition-colors">
+                  <h4 className="font-bold text-neutral-950 text-[14px] group-hover:text-neutral-950 transition-colors">
                     Learning Resources
                   </h4>
-                  <p className="text-[11px] text-[#9CA3AF] mt-0.5">
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
                     Curated courses, videos & articles
                   </p>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-200 group-hover:text-[#005BB7] group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-gray-200 group-hover:text-neutral-950 group-hover:translate-x-1 transition-all" />
               </motion.div>
             </Link>
 
@@ -1036,20 +865,20 @@ export default function DashboardPage() {
                   y: -3,
                   boxShadow: "0 12px 30px -8px rgba(124,58,237,0.1)",
                 }}
-                className="bg-white rounded-[20px] border border-gray-100 p-5 flex items-center gap-4 cursor-pointer group"
+                className="bg-white rounded-lg border border-neutral-200 p-5 flex items-center gap-4 cursor-pointer group"
                 style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center"
+                  className="w-11 h-11 rounded-xl bg-neutral-100 flex items-center justify-center"
                 >
                   <Map className="w-5 h-5 text-gray-900" />
                 </motion.div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-[#020617] text-[14px] group-hover:text-gray-900 transition-colors">
+                  <h4 className="font-bold text-neutral-950 text-[14px] group-hover:text-gray-900 transition-colors">
                     Learning Roadmap
                   </h4>
-                  <p className="text-[11px] text-[#9CA3AF] mt-0.5">
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
                     Step-by-step paths for any tech
                   </p>
                 </div>
@@ -1065,7 +894,7 @@ export default function DashboardPage() {
           className="lg:col-span-4"
         >
           <div
-            className="bg-white rounded-[24px] border border-gray-100 p-5 lg:sticky lg:top-24"
+            className="bg-white rounded-xl border border-neutral-200 p-5 lg:sticky lg:top-24"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <div className="flex items-center justify-between mb-4">
@@ -1076,13 +905,13 @@ export default function DashboardPage() {
                     opacity: [1, 0.7, 1],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className="w-2 h-2 rounded-full bg-emerald-500"
+                  className="w-2 h-2 rounded-full bg-neutral-1000"
                 />
-                <h3 className="text-[14px] font-bold text-[#020617]">
+                <h3 className="text-[14px] font-bold text-neutral-950">
                   Live Activity
                 </h3>
               </div>
-              <span className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-[0.1em]">
+              <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.1em]">
                 Real-time
               </span>
             </div>
@@ -1101,7 +930,7 @@ export default function DashboardPage() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full mt-4 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl text-[12px] font-bold text-[#9CA3AF] hover:text-[#4B5563] transition-colors"
+              className="w-full mt-4 py-2.5 bg-neutral-50 hover:bg-neutral-100 rounded-xl text-[12px] font-bold text-neutral-400 hover:text-neutral-600 transition-colors"
             >
               View All Activity
             </motion.button>
@@ -1111,12 +940,12 @@ export default function DashboardPage() {
           {userProjects && userProjects.length > 0 && (
             <motion.div
               variants={fadeUp}
-              className="bg-white rounded-[24px] border border-gray-100 p-5 mt-6"
+              className="bg-white rounded-xl border border-neutral-200 p-5 mt-6"
               style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
             >
               <div className="flex items-center gap-2 mb-4">
                 <Rocket className="w-4 h-4 text-gray-900" />
-                <h3 className="text-[14px] font-bold text-[#020617]">
+                <h3 className="text-[14px] font-bold text-neutral-950">
                   Project Ideas
                 </h3>
               </div>
@@ -1126,16 +955,16 @@ export default function DashboardPage() {
                   <motion.div
                     key={p.id}
                     whileHover={{ x: 4 }}
-                    className="p-3 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer group"
+                    className="p-3 rounded-xl bg-neutral-50 hover:bg-neutral-50 transition-colors cursor-pointer group"
                   >
-                    <p className="text-[13px] font-semibold text-[#020617] group-hover:text-[#005BB7] transition-colors truncate">
+                    <p className="text-[13px] font-semibold text-neutral-950 group-hover:text-neutral-950 transition-colors truncate">
                       {p.title}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1.5">
                       {p.techStack?.slice(0, 2).map((tech: string) => (
                         <span
                           key={tech}
-                          className="text-[9px] font-bold text-[#9CA3AF] uppercase tracking-wider bg-white px-1.5 py-0.5 rounded border border-gray-100"
+                          className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider bg-white px-1.5 py-0.5 rounded border border-neutral-200"
                         >
                           {tech}
                         </span>
@@ -1147,7 +976,7 @@ export default function DashboardPage() {
 
               <Link
                 href="/dashboard/jobs"
-                className="flex items-center gap-1 mt-3 text-[12px] font-bold text-[#005BB7] hover:text-[#004B99] transition-colors"
+                className="flex items-center gap-1 mt-3 text-[12px] font-bold text-neutral-950 hover:text-neutral-800 transition-colors"
               >
                 View All <ArrowRight className="w-3 h-3" />
               </Link>

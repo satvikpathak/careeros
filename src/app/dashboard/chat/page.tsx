@@ -145,7 +145,7 @@ export default function ChatPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Zap className="w-6 h-6 text-indigo-500 fill-current" /> Placement Mode
+            <Zap className="w-6 h-6 text-neutral-700 fill-current" /> Placement Mode
           </h1>
           <p className="text-sm text-gray-500">
             Company-specific prep and simulated interviews.
@@ -164,7 +164,7 @@ export default function ChatPage() {
             <ScrollArea className="flex-1 p-6" ref={scrollRef}>
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-20 px-6">
-                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-6 shadow-xl shadow-indigo-100 ring-4 ring-indigo-50">
+                  <div className="w-20 h-20 rounded-xl bg-neutral-950 flex items-center justify-center mb-6 shadow-xl ring-4 ring-neutral-100">
                     <Sparkles className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">
@@ -175,7 +175,7 @@ export default function ChatPage() {
                   </p>
                   <Button
                     size="lg"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-lg shadow-indigo-100 rounded-2xl px-8"
+                    className="bg-neutral-950 hover:bg-neutral-800 text-white border-0 shadow-sm rounded-xl px-8"
                     onClick={startPlacementPrep}
                   >
                     🚀 Start Placement Session
@@ -195,25 +195,25 @@ export default function ChatPage() {
                         }`}
                       >
                         {msg.role === "assistant" && (
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 mt-1 shadow-md">
+                          <div className="w-10 h-10 rounded-xl bg-neutral-950 flex items-center justify-center shrink-0 mt-1 shadow-md">
                             <Bot className="w-5 h-5 text-white" />
                           </div>
                         )}
                         <div
                           className={`max-w-[85%] rounded-3xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${
                             msg.role === "user"
-                              ? "bg-indigo-600 text-white rounded-tr-none"
-                              : "bg-white border border-gray-100 text-gray-700 rounded-tl-none"
+                              ? "bg-neutral-950 text-white rounded-tr-none"
+                              : "bg-white border border-neutral-200 text-gray-700 rounded-tl-none"
                           }`}
                         >
                           <div className="whitespace-pre-wrap mark-json">
-                            {msg.content.includes("```json") 
+                            {msg.content.includes("```json")
                                ? msg.content.substring(0, msg.content.indexOf("```json")).trim() + "\n\n[Placement Analysis Processed ✓]"
                                : msg.content}
                           </div>
                         </div>
                         {msg.role === "user" && (
-                          <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 mt-1 text-gray-400">
+                          <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center shrink-0 mt-1 text-gray-400">
                             <User className="w-5 h-5" />
                           </div>
                         )}
@@ -227,12 +227,12 @@ export default function ChatPage() {
                       animate={{ opacity: 1 }}
                       className="flex gap-4"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-md">
+                      <div className="w-10 h-10 rounded-xl bg-neutral-950 flex items-center justify-center shrink-0 shadow-md">
                         <Bot className="w-5 h-5 text-white" />
                       </div>
-                      <div className="bg-white border border-gray-100 rounded-3xl rounded-tl-none px-5 py-3.5 shadow-sm">
+                      <div className="bg-white border border-neutral-200 rounded-3xl rounded-tl-none px-5 py-3.5 shadow-sm">
                         <div className="flex items-center gap-2 text-sm text-gray-400 font-medium">
-                          <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+                          <Loader2 className="w-4 h-4 animate-spin text-neutral-700" />
                           Simulating interviewer response...
                         </div>
                       </div>
@@ -244,8 +244,8 @@ export default function ChatPage() {
 
             {/* Input */}
             {messages.length > 0 && (
-              <div className="p-4 bg-gray-50/50 border-t border-gray-100">
-                <div className="flex gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-100">
+              <div className="p-4 bg-neutral-50 border-t border-neutral-200">
+                <div className="flex gap-3 bg-white p-2 rounded-xl shadow-sm border border-neutral-200 ring-1 ring-neutral-100">
                   <Textarea
                     ref={textareaRef}
                     value={input}
@@ -259,7 +259,7 @@ export default function ChatPage() {
                   <Button
                     onClick={sendMessage}
                     disabled={!input.trim() || isLoading}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 h-11 w-11 p-0 rounded-xl shadow-md"
+                    className="bg-neutral-950 hover:bg-neutral-800 text-white shrink-0 h-11 w-11 p-0 rounded-xl shadow-sm"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
@@ -279,21 +279,21 @@ export default function ChatPage() {
               className="hidden lg:block w-96"
             >
               <Card className="glass-premium border-0 h-full overflow-hidden shadow-2xl flex flex-col">
-                <div className="h-1 bg-gradient-to-r from-emerald-400 to-indigo-500" />
+                <div className="h-1 bg-neutral-950" />
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-black flex items-center gap-2">
-                    <Target className="w-5 h-5 text-indigo-500" /> Prep Intelligence
+                    <Target className="w-5 h-5 text-neutral-700" /> Prep Intelligence
                   </CardTitle>
                   <CardDescription>Generated from session context</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto space-y-6 pt-2 pb-6">
-                  
+
                   {/* Readiness Score */}
-                  <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
-                    <p className="text-[10px] uppercase font-black text-indigo-400 tracking-widest mb-1">Interview Readiness</p>
+                  <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-200 text-center">
+                    <p className="text-[10px] uppercase font-black text-neutral-700 tracking-widest mb-1">Interview Readiness</p>
                     <div className="flex items-end justify-center gap-1">
-                      <span className="text-4xl font-black text-indigo-700">{placementAnalysis.interview_readiness_score}</span>
-                      <span className="text-sm font-bold text-indigo-400 mb-1.5">%</span>
+                      <span className="text-4xl font-black text-neutral-950">{placementAnalysis.interview_readiness_score}</span>
+                      <span className="text-sm font-bold text-neutral-400 mb-1.5">%</span>
                     </div>
                     <Progress value={placementAnalysis.interview_readiness_score} className="h-2 mt-3 bg-white" />
                   </div>
@@ -310,8 +310,8 @@ export default function ChatPage() {
                               <span>{topic}</span>
                               <span className="text-gray-400">{weight}% freq</span>
                            </div>
-                           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-indigo-500" style={{ width: `${weight}%` }} />
+                           <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-neutral-950" style={{ width: `${weight}%` }} />
                            </div>
                         </div>
                       ))}
@@ -325,23 +325,23 @@ export default function ChatPage() {
                     </h4>
                     <div className="space-y-2">
                       {placementAnalysis.hr_question_generator.map((q, i) => (
-                        <div key={i} className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-medium text-gray-700 italic">
-                          {"\u201C"}{q}{"\u201D"}
+                        <div key={i} className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium text-gray-700 italic">
+                          {"“"}{q}{"”"}
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Roadmap Summary */}
-                  <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                    <h4 className="text-[10px] font-black text-emerald-600 uppercase mb-2">Company Specific Strategy</h4>
-                    <p className="text-xs leading-relaxed text-emerald-800 font-medium">
+                  <div className="p-4 bg-neutral-100 rounded-xl border border-neutral-200">
+                    <h4 className="text-[10px] font-black text-neutral-700 uppercase mb-2">Company Specific Strategy</h4>
+                    <p className="text-xs leading-relaxed text-neutral-950 font-medium">
                       {placementAnalysis.company_specific_roadmap}
                     </p>
                   </div>
 
                   <Button
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-lg shadow-indigo-100 py-6 rounded-2xl font-bold"
+                    className="w-full bg-neutral-950 hover:bg-neutral-800 text-white border-0 shadow-sm py-6 rounded-xl font-bold"
                     asChild
                   >
                     <Link href="/dashboard">

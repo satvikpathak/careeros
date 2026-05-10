@@ -72,7 +72,7 @@ export default function DashboardSidebar() {
     >
       {/* Logo */}
       <motion.div variants={itemVariants} className="px-6 py-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#005BB7] to-[#020617] flex items-center justify-center shadow-lg shadow-blue-200/50">
+        <div className="w-10 h-10 rounded-2xl bg-neutral-950 flex items-center justify-center shadow-lg">
           <Zap className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
@@ -81,8 +81,8 @@ export default function DashboardSidebar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
           >
-            <h1 className="text-[15px] font-bold text-[#020617] tracking-tight">CareerOS</h1>
-            <p className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-[0.15em]">Intelligence</p>
+            <h1 className="text-[15px] font-semibold text-neutral-950 tracking-tight">CareerOS</h1>
+            <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-[0.15em]">Intelligence</p>
           </motion.div>
         )}
       </motion.div>
@@ -102,15 +102,15 @@ export default function DashboardSidebar() {
                 className={cn(
                   "relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group",
                   active
-                    ? "text-[#005BB7]"
-                    : "text-[#4B5563] hover:text-[#020617] hover:bg-gray-50/80"
+                    ? "text-neutral-950"
+                    : "text-neutral-600 hover:text-neutral-950 hover:bg-gray-50/80"
                 )}
               >
                 {/* Active indicator background */}
                 {active && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute inset-0 bg-[#EFF6FF] rounded-xl border border-[#005BB7]/10"
+                    className="absolute inset-0 bg-neutral-100 rounded-xl border border-neutral-200"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -120,8 +120,8 @@ export default function DashboardSidebar() {
                   className={cn(
                     "relative z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300",
                     active
-                      ? "bg-[#005BB7]/10 text-[#005BB7]"
-                      : "bg-transparent text-[#9CA3AF] group-hover:text-[#4B5563] group-hover:bg-gray-100"
+                      ? "bg-neutral-950 text-white"
+                      : "bg-transparent text-neutral-400 group-hover:text-neutral-600 group-hover:bg-gray-100"
                   )}
                 >
                   <motion.div
@@ -145,7 +145,7 @@ export default function DashboardSidebar() {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute right-3 w-1.5 h-1.5 rounded-full bg-[#005BB7] z-10"
+                    className="absolute right-3 w-1.5 h-1.5 rounded-full bg-neutral-950 z-10"
                   />
                 )}
               </Link>
@@ -162,7 +162,7 @@ export default function DashboardSidebar() {
         >
           <motion.div
             whileHover={{ y: -2, boxShadow: "0 8px 30px rgba(0,91,183,0.15)" }}
-            className="bg-gradient-to-br from-[#005BB7] to-[#004B99] rounded-2xl p-5 text-white relative overflow-hidden"
+            className="bg-neutral-950 rounded-2xl p-5 text-white relative overflow-hidden"
           >
             {/* Decorative circles */}
             <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-white/10" />
@@ -170,8 +170,8 @@ export default function DashboardSidebar() {
 
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-blue-200" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-blue-200">Pro Plan</span>
+                <Sparkles className="w-4 h-4 text-neutral-300" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-300">Pro Plan</span>
               </div>
               <p className="text-sm font-bold leading-tight mb-3">
                 Unlock advanced AI career insights
@@ -179,7 +179,7 @@ export default function DashboardSidebar() {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="w-full py-2 bg-white text-[#005BB7] rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-shadow"
+                className="w-full py-2 bg-white text-neutral-950 hover:bg-neutral-100 rounded-xl text-xs font-bold shadow-lg hover:shadow-xl transition-shadow"
               >
                 Upgrade Now
               </motion.button>
@@ -192,7 +192,7 @@ export default function DashboardSidebar() {
       <motion.div variants={itemVariants} className="px-3 pb-4 hidden lg:block">
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-2 px-3 py-2 w-full rounded-xl text-sm font-medium text-[#9CA3AF] hover:text-[#4B5563] hover:bg-gray-50 transition-all"
+          className="flex items-center gap-2 px-3 py-2 w-full rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-600 hover:bg-gray-50 transition-all"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           {!collapsed && <span className="text-[13px]">Collapse</span>}
@@ -206,7 +206,7 @@ export default function DashboardSidebar() {
       {/* Mobile Toggle */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-[100] w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center text-[#4B5563] hover:text-[#020617] transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-[100] w-10 h-10 bg-white rounded-xl shadow-lg border border-gray-100 flex items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors"
       >
         {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
