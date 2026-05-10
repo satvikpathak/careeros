@@ -82,6 +82,26 @@ Guidelines:
 
 export async function POST(req: NextRequest) {
   try {
+    const { auth, currentUser } = await import("@clerk/nextjs/server");
+    const { userId: clerkId } = await auth();
+    const user = await currentUser();
+    if (!clerkId || !user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+
+    const { syncUserWithNeon } = await import("@/lib/user-sync");
+    const email = user.emailAddresses[0].emailAddress;
+    const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const dbUser = await syncUserWithNeon(clerkId, email, name);
+
+    const { canUse, recordUsage } = await import("@/lib/billing/access");
+    const quota = await canUse(dbUser.id, "roadmap");
+    if (!quota.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: "quota_exceeded",
+        data: { planKey: quota.planKey, used: quota.used, limit: quota.limit, kind: "roadmap" },
+      }, { status: 402 });
+    }
+
     const { topic, currentSkills, targetRole } = await req.json();
 
     if (!topic) {
@@ -128,45 +148,36 @@ Make it practical, actionable, and progressive from fundamentals to advanced top
     // Persist roadmap to DB
     let savedRoadmapId = null;
     try {
-      const { auth, currentUser } = await import("@clerk/nextjs/server");
-      const { syncUserWithNeon } = await import("@/lib/user-sync");
       const { db } = await import("@/db");
       const { roadmaps } = await import("@/db/schema");
-      const { eq, and } = await import("drizzle-orm");
+      const { eq } = await import("drizzle-orm");
 
-      const { userId: clerkId } = await auth();
-      const user = await currentUser();
+      // Deactivate previous roadmaps for this user
+      await db.update(roadmaps)
+        .set({ isActive: false })
+        .where(eq(roadmaps.userId, dbUser.id));
 
-      if (clerkId && user) {
-        const email = user.emailAddresses[0].emailAddress;
-        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        const dbUser = await syncUserWithNeon(clerkId, email, name);
+      // Save new roadmap
+      const [saved] = await db.insert(roadmaps).values({
+        userId: dbUser.id,
+        title: roadmap.title || topic,
+        topic: topic,
+        targetRole: targetRole || null,
+        estimatedDuration: roadmap.estimated_duration || null,
+        difficulty: roadmap.difficulty || null,
+        steps: roadmap.steps || [],
+        sourceType: currentSkills?.length ? "auto" : "manual",
+        completedPhases: {},
+        topicChecklist: {},
+        isActive: true,
+      }).returning();
 
-        // Deactivate previous roadmaps for this user
-        await db.update(roadmaps)
-          .set({ isActive: false })
-          .where(eq(roadmaps.userId, dbUser.id));
-
-        // Save new roadmap
-        const [saved] = await db.insert(roadmaps).values({
-          userId: dbUser.id,
-          title: roadmap.title || topic,
-          topic: topic,
-          targetRole: targetRole || null,
-          estimatedDuration: roadmap.estimated_duration || null,
-          difficulty: roadmap.difficulty || null,
-          steps: roadmap.steps || [],
-          sourceType: currentSkills?.length ? "auto" : "manual",
-          completedPhases: {},
-          topicChecklist: {},
-          isActive: true,
-        }).returning();
-
-        savedRoadmapId = saved.id;
-      }
+      savedRoadmapId = saved.id;
     } catch (dbError) {
       console.warn("Roadmap DB persistence failed:", dbError);
     }
+
+    await recordUsage(dbUser.id, "roadmap");
 
     return NextResponse.json({
       success: true,
