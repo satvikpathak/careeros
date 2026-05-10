@@ -12,6 +12,26 @@ export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    const { auth, currentUser } = await import("@clerk/nextjs/server");
+    const { userId: clerkId } = await auth();
+    const user = await currentUser();
+    if (!clerkId || !user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+
+    const { syncUserWithNeon } = await import("@/lib/user-sync");
+    const email = user.emailAddresses[0].emailAddress;
+    const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const dbUser = await syncUserWithNeon(clerkId, email, name);
+
+    const { canUse, recordUsage } = await import("@/lib/billing/access");
+    const quota = await canUse(dbUser.id, "sprint_regen");
+    if (!quota.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: "quota_exceeded",
+        data: { planKey: quota.planKey, used: quota.used, limit: quota.limit, kind: "sprint_regen" },
+      }, { status: 402 });
+    }
+
     const { audit, targetRole, weekNumber } = await req.json();
 
     if (!audit || !targetRole) {
@@ -56,43 +76,33 @@ export async function POST(req: NextRequest) {
     }));
 
     // DB Persistence — best effort
-    let dbUser = null;
     let savedSprintId = null;
 
     try {
-      const { auth, currentUser } = await import("@clerk/nextjs/server");
-      const { syncUserWithNeon } = await import("@/lib/user-sync");
       const { db } = await import("@/db");
       const { weeklySprints } = await import("@/db/schema");
 
-      const { userId: clerkId } = await auth();
-      const user = await currentUser();
+      const [savedSprint] = await db.insert(weeklySprints).values({
+        userId: dbUser.id,
+        weekNumber: sprintData.week_number || weekNumber || 1,
+        year: new Date().getFullYear(),
+        tasks: sprintData.tasks,
+        completionRate: "0",
+      }).returning();
 
-      if (clerkId && user) {
-        const email = user.emailAddresses[0].emailAddress;
-        const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        dbUser = await syncUserWithNeon(clerkId, email, name);
-
-        const [savedSprint] = await db.insert(weeklySprints).values({
-          userId: dbUser.id,
-          weekNumber: sprintData.week_number || weekNumber || 1,
-          year: new Date().getFullYear(),
-          tasks: sprintData.tasks,
-          completionRate: "0",
-        }).returning();
-
-        savedSprintId = savedSprint.id;
-      }
+      savedSprintId = savedSprint.id;
     } catch (dbError) {
       console.warn("Sprint DB persistence failed:", dbError);
     }
+
+    await recordUsage(dbUser.id, "sprint_regen");
 
     return NextResponse.json({
       success: true,
       data: {
         ...sprintData,
         sprintId: savedSprintId,
-        userId: dbUser?.id,
+        userId: dbUser.id,
       }
     });
   } catch (error: unknown) {

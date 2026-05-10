@@ -25,6 +25,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatStore } from "@/stores/chat-store";
 import type { ChatMessage, PlacementAnalysis } from "@/lib/types";
 import Link from "next/link";
+import { UpgradeModal } from "@/components/billing/UpgradeModal";
 
 export default function ChatPage() {
   const {
@@ -38,6 +39,8 @@ export default function ChatPage() {
     reset,
   } = useChatStore();
 
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState("");
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -76,6 +79,13 @@ export default function ChatPage() {
       });
 
       const data = await response.json();
+
+      if (response.status === 402) {
+        setUpgradeReason(`You've sent ${data.data.used} of ${data.data.limit} AI messages today.`);
+        setUpgradeOpen(true);
+        setLoading(false);
+        return;
+      }
 
       if (data.success) {
         const content = data.data.content;
@@ -354,6 +364,7 @@ export default function ChatPage() {
           )}
         </AnimatePresence>
       </div>
+      <UpgradeModal open={upgradeOpen} onOpenChange={setUpgradeOpen} reason={upgradeReason} />
     </div>
   );
 }

@@ -9,6 +9,9 @@ export const users = pgTable("users", {
   streakCount: integer("streak_count").default(0),
   lastAuditAt: timestamp("last_audit_at"),
   onboardedAt: timestamp("onboarded_at"),
+  dodoCustomerId: varchar("dodo_customer_id", { length: 255 }),
+  subscriptionStatus: varchar("subscription_status", { length: 30 }),
+  currentPeriodEnd: timestamp("current_period_end"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -134,5 +137,49 @@ export const emailSubscriptions = pgTable(
   },
   (t) => ({
     userKindUnique: uniqueIndex("email_subscriptions_user_kind_unique").on(t.userId, t.kind),
+  })
+);
+
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull().unique(),
+    dodoSubscriptionId: varchar("dodo_subscription_id", { length: 255 }).notNull(),
+    dodoCustomerId: varchar("dodo_customer_id", { length: 255 }).notNull(),
+    planKey: varchar("plan_key", { length: 50 }).notNull(),
+    status: varchar("status", { length: 30 }).notNull(),
+    currentPeriodStart: timestamp("current_period_start"),
+    currentPeriodEnd: timestamp("current_period_end"),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    raw: jsonb("raw"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  }
+);
+
+export const usageEvents = pgTable(
+  "usage_events",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id).notNull(),
+    kind: varchar("kind", { length: 50 }).notNull(),
+    occurredAt: timestamp("occurred_at").defaultNow().notNull(),
+    metadata: jsonb("metadata"),
+  }
+);
+
+export const webhookEvents = pgTable(
+  "webhook_events",
+  {
+    id: serial("id").primaryKey(),
+    provider: varchar("provider", { length: 30 }).notNull(),
+    externalId: varchar("external_id", { length: 255 }).notNull(),
+    eventType: varchar("event_type", { length: 100 }).notNull(),
+    receivedAt: timestamp("received_at").defaultNow(),
+    payload: jsonb("payload"),
+  },
+  (t) => ({
+    providerExternalUnique: uniqueIndex("webhook_events_provider_external_unique").on(t.provider, t.externalId),
   })
 );
