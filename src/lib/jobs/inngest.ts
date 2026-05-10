@@ -1,4 +1,5 @@
 import { Inngest } from "inngest";
+import { sendWelcome, sendAuditComplete, sendWeeklyDigest, weeklyDigestCron } from "./email-functions";
 
 export const inngest = new Inngest({ id: "careeros" });
 
@@ -10,4 +11,4 @@ export const auditRun = inngest.createFunction(
   }
 );
 
-export const inngestFunctions = [auditRun];
+export const inngestFunctions = [auditRun, sendWelcome, sendAuditComplete, sendWeeklyDigest, weeklyDigestCron];
