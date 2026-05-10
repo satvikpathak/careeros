@@ -23,6 +23,16 @@ export async function POST(req: NextRequest) {
     const { syncUserWithNeon } = await import("@/lib/user-sync");
     const dbUser = await syncUserWithNeon(clerkId, user.emailAddresses[0].emailAddress, `${user.firstName || ""} ${user.lastName || ""}`.trim());
 
+    const { canUse, recordUsage } = await import("@/lib/billing/access");
+    const quota = await canUse(dbUser.id, "audit");
+    if (!quota.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: "quota_exceeded",
+        data: { planKey: quota.planKey, used: quota.used, limit: quota.limit, kind: "audit" },
+      }, { status: 402 });
+    }
+
     const bytes = Buffer.from(await file.arrayBuffer());
     let s3Url = `local:///tmp/${file.name}`;
     try {
@@ -48,6 +58,8 @@ export async function POST(req: NextRequest) {
       targetRole,
       githubUrl: githubUrl || null,
     }).returning();
+
+    await recordUsage(dbUser.id, "audit", { jobId: job.id });
 
     const { isInngestConfigured, fireAndForget } = await import("@/lib/audit/dev-runner");
     if (isInngestConfigured()) {
