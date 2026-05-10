@@ -91,6 +91,16 @@ export async function runAuditJob(jobId: number): Promise<void> {
         progress: { stage: "saving", pct: 100 },
       })
       .where(eq(auditJobs.id, jobId));
+
+    try {
+      const { isInngestConfigured } = await import("./dev-runner");
+      if (isInngestConfigured()) {
+        const { inngest } = await import("@/lib/jobs/inngest");
+        await inngest.send({ name: "email/audit-complete", data: { userId: job.userId, auditId: savedAudit.id } });
+      }
+    } catch (emailErr) {
+      console.warn("audit-complete email enqueue failed:", emailErr);
+    }
   } catch (err) {
     await db.update(auditJobs)
       .set({
