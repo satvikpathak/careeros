@@ -5,6 +5,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAI } from "@/lib/gemini";
 
+import type { HeavyRouteConfig } from "@/lib/runtime-config";
+export const runtime: HeavyRouteConfig["runtime"] = "nodejs";
+export const maxDuration: HeavyRouteConfig["maxDuration"] = 60;
+export const dynamic: HeavyRouteConfig["dynamic"] = "force-dynamic";
+
 export const MARKET_RADAR_PROMPT = `
 You are the Market Radar AI for CareerOS 2.0.
 Your task is to analyze current hiring trends in the technology sector (focusing on India but globally aware).
