@@ -60,6 +60,7 @@ import { useRoadmapStore } from "@/stores/roadmap-store";
 import { StatCard } from "@/components/ui/stat-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AuditProgress } from "@/components/audit/AuditProgress";
 
 /* ============================================ */
 /* Animation Variants                           */
@@ -228,10 +229,21 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "sprints" | "projects">("overview");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const { setRoadmap, setAuditContext, roadmap: storeRoadmap } = useRoadmapStore();
 
   useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/audit/latest-job", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success && j.data && (j.data.status === "queued" || j.data.status === "running")) {
+          setActiveJobId(j.data.id);
+        }
+      });
   }, []);
 
   const fetchDashboardData = async () => {
@@ -385,6 +397,17 @@ export default function DashboardPage() {
           </div>
         }
       />
+
+      {activeJobId && (
+        <AuditProgress
+          jobId={activeJobId}
+          onComplete={() => {
+            setActiveJobId(null);
+            fetchDashboardData();
+          }}
+          onError={() => setActiveJobId(null)}
+        />
+      )}
 
       {/* ==================== KPI CARDS ==================== */}
       <motion.div
