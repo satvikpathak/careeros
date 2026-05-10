@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   subscriptionTier: varchar("subscription_tier", { length: 50 }).default("free"),
   streakCount: integer("streak_count").default(0),
   lastAuditAt: timestamp("last_audit_at"),
+  onboardedAt: timestamp("onboarded_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -69,4 +70,20 @@ export const roadmaps = pgTable("roadmaps", {
   topicChecklist: jsonb("topic_checklist"), // Record<number, Record<number, boolean>>
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const auditJobs = pgTable("audit_jobs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("queued"),
+  progress: jsonb("progress").default({}),
+  s3Url: varchar("s3_url", { length: 1024 }),
+  fileName: varchar("file_name", { length: 512 }),
+  targetRole: varchar("target_role", { length: 255 }),
+  githubUrl: varchar("github_url", { length: 512 }),
+  error: text("error"),
+  auditId: integer("audit_id").references(() => careerAudits.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  startedAt: timestamp("started_at"),
+  finishedAt: timestamp("finished_at"),
 });
