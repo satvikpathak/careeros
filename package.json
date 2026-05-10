@@ -44,6 +44,7 @@
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
     "resend": "^6.12.3",
+    "standardwebhooks": "^1.0.0",
     "svix": "^1.93.0",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
