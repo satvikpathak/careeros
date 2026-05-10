@@ -61,6 +61,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AuditProgress } from "@/components/audit/AuditProgress";
+import { NeedsAttentionWidget } from "@/components/dashboard/NeedsAttentionWidget";
 
 /* ============================================ */
 /* Animation Variants                           */
@@ -905,8 +906,10 @@ export default function DashboardPage() {
           variants={fadeUp}
           className="lg:col-span-4"
         >
+          <NeedsAttentionWidget />
+
           <div
-            className="bg-white rounded-xl border border-neutral-200 p-5 lg:sticky lg:top-24"
+            className="bg-white rounded-xl border border-neutral-200 p-5 lg:sticky lg:top-24 mt-6"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <div className="flex items-center justify-between mb-4">
