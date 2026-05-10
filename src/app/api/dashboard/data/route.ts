@@ -64,6 +64,9 @@ export async function GET(req: NextRequest) {
         where: eq(skillProgress.userId, dbUser.id),
       });
 
+      const { getAuditTrend } = await import("@/lib/audit/trend");
+      const auditTrend = await getAuditTrend(dbUser.id);
+
       // Load active roadmap
       const activeRoadmap = await db.query.roadmaps.findFirst({
         where: and(eq(roadmaps.userId, dbUser.id), eq(roadmaps.isActive, true)),
@@ -107,6 +110,7 @@ export async function GET(req: NextRequest) {
             completedPhases: activeRoadmap.completedPhases || {},
             topicChecklist: activeRoadmap.topicChecklist || {},
           } : null,
+          auditTrend,
         },
       });
     } catch (dbError) {
@@ -126,6 +130,7 @@ export async function GET(req: NextRequest) {
           projects: [],
           skillProgress: [],
           roadmap: null,
+          auditTrend: [],
         },
       });
     }
