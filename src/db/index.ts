@@ -7,8 +7,11 @@ const databaseUrl = process.env.DATABASE_URL;
 function createDb() {
   if (!databaseUrl) {
     console.warn("DATABASE_URL is missing. DB operations will fail at runtime.");
-    // Return a proxy that throws a descriptive error on any property access that leads to a call
-    return drizzle(neon("postgresql://placeholder:placeholder@localhost/placeholder"), { schema });
+    return new Proxy({} as ReturnType<typeof drizzle>, {
+      get() {
+        throw new Error("DATABASE_URL is missing. Set it in your environment before using the database.");
+      },
+    });
   }
 
   const sql = neon(databaseUrl);

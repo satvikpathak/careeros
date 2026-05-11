@@ -12,14 +12,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  let dbUser = await db.query.users.findFirst({ where: eq(users.clerkId, clerkId) });
-  if (!dbUser) {
-    const clerk = await currentUser();
-    if (clerk) {
-      const email = clerk.emailAddresses[0]?.emailAddress || "";
-      const name = `${clerk.firstName || ""} ${clerk.lastName || ""}`.trim();
-      dbUser = await syncUserWithNeon(clerkId, email, name);
+  let dbUser = null;
+  try {
+    dbUser = await db.query.users.findFirst({ where: eq(users.clerkId, clerkId) });
+    if (!dbUser) {
+      const clerk = await currentUser();
+      if (clerk) {
+        const email = clerk.emailAddresses[0]?.emailAddress || "";
+        const name = `${clerk.firstName || ""} ${clerk.lastName || ""}`.trim();
+        dbUser = await syncUserWithNeon(clerkId, email, name);
+      }
     }
+  } catch (error) {
+    console.error("Dashboard layout DB error:", error);
   }
 
   const hdrs = await headers();
